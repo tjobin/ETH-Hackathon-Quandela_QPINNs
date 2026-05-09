@@ -1,0 +1,42 @@
+{
+  "timestamp": "2026-05-09T15:04:38.149004",
+  "num_experiments": 3,
+  "experiments": {
+    "baseline_qpinn": {
+      "rel_l2": 0.038255080580711365,
+      "mae": 0.015034934505820274,
+      "max_abs_error": 0.03472977876663208,
+      "rmse": 0.017762579023838043
+    },
+    "low_data_qpinn": {
+      "rel_l2": 0.04075611010193825,
+      "mae": 0.015995856374502182,
+      "max_abs_error": 0.03555622696876526,
+      "rmse": 0.01892385445535183
+    },
+    "high_lambda_ic_qpinn": {
+      "rel_l2": 0.2598925828933716,
+      "mae": 0.09184134006500244,
+      "max_abs_error": 0.25639891624450684,
+      "rmse": 0.12067317962646484
+    }
+  },
+  "best_metrics": {
+    "rel_l2": {
+      "experiment": "baseline_qpinn",
+      "value": 0.038255080580711365
+    },
+    "mae": {
+      "experiment": "baseline_qpinn",
+      "value": 0.015034934505820274
+    },
+    "max_abs_error": {
+      "experiment": "baseline_qpinn",
+      "value": 0.03472977876663208
+    },
+    "rmse": {
+      "experiment": "baseline_qpinn",
+      "value": 0.017762579023838043
+    }
+  }
+}
