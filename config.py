@@ -40,6 +40,7 @@ class ModelConfig:
     hidden_feature: int = 16           # hidden layer for feature map
     hidden_readout: int = 16           # hidden layer for readout
     use_hard_bc: bool = True           # enforce boundary conditions in architecture
+    quantum_type: str = "simple"       # "simple" or "builder"
 
 
 @dataclass
@@ -181,6 +182,22 @@ def lbfgs_config() -> ExperimentConfig:
     cfg.training.epochs = 100  # LBFGS typically converges faster
     return cfg
 
+def deep_builder_config() -> ExperimentConfig:
+    """Configuration for the 4-mode, 3-photon CircuitBuilder with data re-uploading."""
+    cfg = baseline_config()
+    cfg.name = "deep_quantum_builder"
+    cfg.model = ModelConfig(
+        # The builder encodes data into exactly 2 modes (modes 0 and 1)
+        feature_size=4,              
+        # 4 modes with 3 photons yields C(4+3-1, 3) = 20 distinct Fock basis states
+        # The probs() measurement outputs a vector of this exact size
+        quantum_output_size=4,      
+        hidden_feature=16,
+        hidden_readout=16,
+        quantum_type="builder"       # Triggers the new model class
+    )
+    return cfg
+
 
 # ============================================================================
 # Config Registry for Easy Access
@@ -194,6 +211,7 @@ EXPERIMENT_REGISTRY = {
     "longer_training": longer_training_config,
     "low_consistency": low_consistency_config,
     "lbfgs": lbfgs_config,
+    "deep_builder": deep_builder_config,
     
     "feature_2": lambda: feature_size_sweep(2),
     "feature_4": lambda: feature_size_sweep(4),
