@@ -36,14 +36,52 @@ class Trainer:
         self.output_dir = Path(output_dir) if output_dir else Path("./results") / config.name
         self.output_dir.mkdir(parents=True, exist_ok=True)
         
+        # Freeze layers based on config
+        layers_to_freeze = []
+        if config.training.freeze_quantum:
+            layers_to_freeze.append('quantum')
+        if config.training.freeze_feature_map:
+            layers_to_freeze.append('feature_map')
+        if config.training.freeze_readout:
+            layers_to_freeze.append('readout')
+        
+        if layers_to_freeze:
+            print("\n" + "="*70)
+            print(f"FREEZING LAYERS: {', '.join(layers_to_freeze)}")
+            print("="*70)
+            for name, param in model.named_parameters():
+                for layer in layers_to_freeze:
+                    if layer in name:
+                        param.requires_grad = False
+                        print(f"  Frozen: {name}")
+        
+        # Count trainable parameters
+        total_params = sum(p.numel() for p in model.parameters())
+        trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
+        print(f"Total parameters: {total_params:,}")
+        print(f"Trainable parameters: {trainable_params:,}")
+        if layers_to_freeze:
+            frozen_params = total_params - trainable_params
+            print(f"Frozen parameters: {frozen_params:,}")
+        print("="*70 + "\n")
+        
         # Initialize optimizer
         self.optimizer = self._create_optimizer()
         
         # Initialize learning rate scheduler if specified
         self.scheduler = self._create_scheduler()
         
-        # Initialize loss function and sampler
-        self.physics_loss = PhysicsLoss(config.pde)
+        # Initialize loss function based on PDE type
+        pde_name = config.pde.__class__.__name__
+        if "Burgers" in pde_name:
+            from losses import BurgersPhysicsLoss
+            self.physics_loss = BurgersPhysicsLoss(config.pde)
+        elif "Wave" in pde_name:
+            from losses import WavePhysicsLoss
+            self.physics_loss = WavePhysicsLoss(config.pde)
+        else:
+            # Default to standard heat equation loss
+            self.physics_loss = PhysicsLoss(config.pde)
         self.sampler = DataSampler(config.data, config.pde, device, dtype)
         
         # Training history
@@ -275,7 +313,8 @@ class Evaluator:
 
 
 def run_experiment(experiment_name: str, model_type: str = "qpinn",
-                  output_dir: Optional[str] = None) -> Dict:
+                  output_dir: Optional[str] = None, 
+                  freeze_quantum: bool = False) -> Dict:
     """
     Run a complete experiment: train, evaluate, and return results.
     
@@ -289,6 +328,10 @@ def run_experiment(experiment_name: str, model_type: str = "qpinn",
     """
     # Get configuration
     config = get_config(experiment_name)
+    
+    # Apply CLI flags to config
+    if freeze_quantum:
+        config.training.freeze_quantum = True
     
     # Set up device and dtype
     device = torch.device("cuda" if torch.cuda.is_available() and config.device == "cuda"
@@ -358,10 +401,12 @@ def main():
     parser.add_argument("--experiment", type=str, default="baseline",
                        help="Experiment configuration to run")
     parser.add_argument("--model-type", type=str, default="qpinn",
-                       choices=["qpinn", "classical", "deep_classical"],
+                       choices=["qpinn", "qpinn_frozen", "classical", "deep_classical"],
                        help="Model type to use")
     parser.add_argument("--output-dir", type=str, default=None,
                        help="Output directory for results")
+    parser.add_argument("--freeze-quantum", action="store_true",
+                       help="Freeze quantum layer, only train classical layers")
     parser.add_argument("--list-experiments", action="store_true",
                        help="List available experiments and exit")
     
@@ -377,7 +422,8 @@ def main():
     results = run_experiment(
         args.experiment,
         model_type=args.model_type,
-        output_dir=args.output_dir
+        output_dir=args.output_dir,
+        freeze_quantum=args.freeze_quantum
     )
 
 
