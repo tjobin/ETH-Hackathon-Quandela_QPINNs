@@ -48,6 +48,22 @@ class Trainer:
         
         # Training history
         self.history = []
+
+        # Freeze layers based on config
+        layers_to_freeze = []
+        if config.training.freeze_quantum:
+            layers_to_freeze.append('quantum')
+        if config.training.freeze_feature_map:
+            layers_to_freeze.append('feature_map')
+        if config.training.freeze_readout:
+            layers_to_freeze.append('readout')
+
+        if layers_to_freeze:
+            print(f"Freezing layers: {layers_to_freeze}")
+            for name, param in model.named_parameters():
+                for layer in layers_to_freeze:
+                    if layer in name:
+                        param.requires_grad = False
     
     def _create_optimizer(self) -> torch.optim.Optimizer:
         """Create optimizer based on config."""
@@ -355,6 +371,8 @@ def main():
                        help="Model type to use")
     parser.add_argument("--output-dir", type=str, default=None,
                        help="Output directory for results")
+    parser.add_argument("--freeze-quantum", action="store_true",
+                       help="Freeze quantum layer, only train classical layers")
     parser.add_argument("--list-experiments", action="store_true",
                        help="List available experiments and exit")
     

@@ -60,6 +60,11 @@ class TrainingConfig:
     lr_decay_factor: float = 0.1
     lr_decay_steps: int = 100
 
+    # Layer freezing options
+    freeze_quantum: bool = False
+    freeze_feature_map: bool = False
+    freeze_readout: bool = False
+
 
 @dataclass
 class EvaluationConfig:
@@ -137,6 +142,21 @@ def quantum_architecture_config() -> ExperimentConfig:
     )
     return cfg
 
+def freeze_quantum_config() -> ExperimentConfig:
+    """Only train classical layers, freeze quantum."""
+    cfg = baseline_config()
+    cfg.name = "freeze_quantum"
+    cfg.training.freeze_quantum = True
+    return cfg
+
+def freeze_feature_map_config() -> ExperimentConfig:
+    """Only train readout, freeze feature map and quantum."""
+    cfg = baseline_config()
+    cfg.name = "freeze_feature_map"
+    cfg.training.freeze_quantum = True
+    cfg.training.freeze_feature_map = True
+    return cfg
+
 def feature_size_sweep(f: int) -> ExperimentConfig:
     """Sweep over feature map size."""
     cfg = baseline_config()
@@ -199,6 +219,9 @@ EXPERIMENT_REGISTRY = {
     "feature_4": lambda: feature_size_sweep(4),
     "feature_8": lambda: feature_size_sweep(8),
     "feature_16": lambda: feature_size_sweep(16),
+
+    "freeze_quantum_config": freeze_quantum_config,
+    "freeze_feature_map_config": freeze_feature_map_config,
 }
 
 
