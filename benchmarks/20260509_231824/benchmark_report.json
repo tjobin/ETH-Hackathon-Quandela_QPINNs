@@ -1,0 +1,13 @@
+{
+  "timestamp": "2026-05-09T23:18:51.621841",
+  "num_experiments": 2,
+  "experiments": {
+    "baseline_classical": {
+      "error": "'FourierPlotter' object has no attribute 'plot_energy_distribution'"
+    },
+    "baseline_qpinn": {
+      "error": "'FourierPlotter' object has no attribute 'plot_energy_distribution'"
+    }
+  },
+  "best_metrics": {}
+}

@@ -84,6 +84,10 @@ class Trainer:
             self.physics_loss = PhysicsLoss(config.pde)
         self.sampler = DataSampler(config.data, config.pde, device, dtype)
         
+        # Initialize Fourier metrics monitor
+        from fourier_metrics import FourierTrainingMonitor
+        self.fourier_monitor = FourierTrainingMonitor(device, dtype)
+        
         # Training history
         self.history = []
     
@@ -195,7 +199,7 @@ class Trainer:
                 loss_dict["boundary"],
             ])
             
-            # Logging
+            # Logging and Fourier metrics evaluation
             if epoch == 1 or epoch % self.config.log_every == 0:
                 elapsed = time.time() - start_time
                 print(
@@ -207,6 +211,14 @@ class Trainer:
                     f"BC: {loss_dict['boundary']:.2e} | "
                     f"Time: {elapsed:.1f}s"
                 )
+                
+                # Evaluate Fourier metrics every log_every epochs
+                fourier_metrics = self.fourier_monitor.evaluate(
+                    self.model, self.config, self.device, self.dtype, epoch
+                )
+                print(f"  Fourier - SpectralL2: {fourier_metrics['spectral_l2']:.4e} | "
+                      f"PowerError: {fourier_metrics['power_spectrum_error']:.4e} | "
+                      f"LowFreq: {fourier_metrics['low_freq_error']:.4e}")
         
         elapsed = time.time() - start_time
         print(f"\nTraining completed in {elapsed:.2f} seconds")
@@ -372,6 +384,35 @@ def run_experiment(experiment_name: str, model_type: str = "qpinn",
     plotter.plot_solution_slices(U_true, U_pred, x_grid, t_grid,
                                 save_name="solution_slices.png")
     
+    # Plot Fourier metrics
+    from fourier_plotter import FourierPlotter
+    fourier_plotter = FourierPlotter(save_dir=output_dir)
+    fourier_plotter.plot_power_spectrum(U_pred, U_true,
+                                       save_name="fourier_power_spectrum.png")
+    fourier_plotter.plot_spectral_errors(trainer.fourier_monitor.get_history(),
+                                        save_name="fourier_spectral_errors.png")
+    fourier_plotter.plot_spectral_concentration(trainer.fourier_monitor.get_history(),
+                                               save_name="fourier_concentration.png")
+    fourier_plotter.plot_peak_frequency(trainer.fourier_monitor.get_history(),
+                                       save_name="fourier_peak_frequency.png")
+    fourier_plotter.plot_all_spectral(U_pred, U_true, 
+                                     trainer.fourier_monitor.get_history(),
+                                     save_name="fourier_comprehensive.png")
+    
+    # Mode-by-mode analysis
+    fourier_plotter.plot_mode_l2_errors(U_pred, U_true,
+                                       save_name="fourier_mode_l2_errors.png")
+    fourier_plotter.plot_mode_l2_vs_k_detailed(U_pred, U_true,
+                                              save_name="fourier_mode_l2_vs_k.png")
+    fourier_plotter.plot_mode_comparison(U_pred, U_true, n_modes=16,
+                                        save_name="fourier_mode_comparison.png")
+    fourier_plotter.plot_cumulative_energy(U_pred, U_true,
+                                          save_name="fourier_cumulative_energy.png")
+    
+    # Energy distribution
+    fourier_plotter.plot_energy_distribution(U_true,
+                                           save_name="fourier_energy_distribution.png")
+    
     # Save results
     results = {
         "experiment": config.name,
@@ -379,7 +420,16 @@ def run_experiment(experiment_name: str, model_type: str = "qpinn",
         "config": config.__dict__,
         "metrics": metrics,
         "history": history.tolist(),
+        "fourier_metrics": trainer.fourier_monitor.get_history(),
+        "fourier_summary": trainer.fourier_monitor.summary(),
     }
+    
+    # Save solutions as numpy files for efficient storage
+    u_pred_np = U_pred.cpu().numpy() if hasattr(U_pred, 'cpu') else np.array(U_pred)
+    u_true_np = U_true.cpu().numpy() if hasattr(U_true, 'cpu') else np.array(U_true)
+    
+    np.save(Path(output_dir) / "U_pred.npy", u_pred_np)
+    np.save(Path(output_dir) / "U_true.npy", u_true_np)
     
     results_path = Path(output_dir) / "results.json"
     with open(results_path, 'w') as f:

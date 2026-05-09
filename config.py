@@ -175,7 +175,7 @@ class ModelConfig:
 @dataclass
 class TrainingConfig:
     """Training hyperparameters."""
-    epochs: int = 300
+    epochs: int = 600
     learning_rate: float = 1e-2
     optimizer_type: str = "Adam"  # "Adam", "SGD", "LBFGS", etc.
     
