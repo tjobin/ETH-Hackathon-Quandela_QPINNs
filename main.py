@@ -309,23 +309,20 @@ class Evaluator:
         return U_pred, U_true, x, t, metrics
 
 
-def run_experiment(experiment_name: str, model_type: str = "qpinn",
-                  output_dir: Optional[str] = None, 
-                  freeze_quantum: bool = False) -> Dict:
+def run_config(config: ExperimentConfig, model_type: str = "qpinn",
+               output_dir: Optional[str] = None,
+               freeze_quantum: bool = False) -> Dict:
     """
-    Run a complete experiment: train, evaluate, and return results.
+    Run a complete experiment from an already constructed config.
     
     Args:
-        experiment_name: name of experiment configuration
+        config: complete experiment configuration
         model_type: "qpinn", "classical", or "deep_classical"
         output_dir: directory for saving results
     
     Returns:
         results: dictionary with training, evaluation, and metrics info
     """
-    # Get configuration
-    config = get_config(experiment_name)
-    
     # Apply CLI flags to config
     if freeze_quantum:
         config.training.freeze_quantum = True
@@ -387,6 +384,29 @@ def run_experiment(experiment_name: str, model_type: str = "qpinn",
     print(f"\nResults saved to: {results_path}")
     
     return results
+
+
+def run_experiment(experiment_name: str, model_type: str = "qpinn",
+                  output_dir: Optional[str] = None,
+                  freeze_quantum: bool = False) -> Dict:
+    """
+    Run a complete registered experiment: train, evaluate, and return results.
+
+    Args:
+        experiment_name: name of experiment configuration
+        model_type: "qpinn", "classical", or "deep_classical"
+        output_dir: directory for saving results
+
+    Returns:
+        results: dictionary with training, evaluation, and metrics info
+    """
+    config = get_config(experiment_name)
+    return run_config(
+        config,
+        model_type=model_type,
+        output_dir=output_dir,
+        freeze_quantum=freeze_quantum,
+    )
 
 
 def main():

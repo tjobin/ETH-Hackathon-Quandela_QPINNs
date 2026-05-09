@@ -14,8 +14,8 @@ from typing import List, Dict
 import numpy as np
 from datetime import datetime
 
-from config import get_config, list_experiments
-from main import run_experiment
+from config import list_experiments, freq_sweep
+from main import run_experiment, run_config
 from plotter import Plotter
 
 
@@ -78,7 +78,105 @@ class BenchmarkSuite:
                     self.results[exp_key] = {"error": str(e)}
         
         return self.results
-    
+
+    def freq_sweep(self, freqs: List[float],
+                   model_types: List[str] = None,
+                   epochs: int = None) -> Dict:
+        """
+        Frequency sweep.
+
+        Args:
+            freqs: list of frequencies to try
+            model_types: list of model types to compare
+            epochs: optional override for training epochs
+
+        Returns:
+            results: dictionary with sweep results
+        """
+
+        if freqs is None:
+            freqs = [0.5, 0.7, 1.0, 1.5, 2.0]
+        if model_types is None:
+            model_types = ["qpinn", "classical"]
+
+        print(f"\n{'=' * 70}")
+        print(f"Frequency Sweep")
+        print(f"Frequencies: {freqs}")
+        print(f"Model types: {model_types}")
+        print(f"{'=' * 70}\n")
+
+        sweep_summary = {model_type: [] for model_type in model_types}
+
+        for freq in freqs:
+            for model_type in model_types:
+                cfg = freq_sweep(freq)
+                if epochs is not None:
+                    cfg.training.epochs = epochs
+
+                freq_label = f"{freq:g}".replace(".", "p")
+                exp_key = f"freq_sweep_freq{freq_label}_{model_type}"
+
+                print(f"\nRunning frequency sweep: freq={freq}, model={model_type}")
+
+                try:
+                    output_dir = self.benchmark_dir / exp_key
+
+                    results = run_config(
+                        cfg,
+                        model_type=model_type,
+                        output_dir=str(output_dir)
+                    )
+
+                    self.results[exp_key] = results
+                    history = np.array(results["history"])
+                    sweep_summary[model_type].append({
+                        "frequency": freq,
+                        "model_type": model_type,
+                        "experiment_key": exp_key,
+                        "final_loss": float(history[-1, 0]),
+                        "best_loss": float(history[:, 0].min()),
+                        "rel_l2": results["metrics"].get("rel_l2"),
+                        "mae": results["metrics"].get("mae"),
+                        "rmse": results["metrics"].get("rmse"),
+                    })
+
+                    print(f"✓ Completed: freq={freq}, model={model_type}")
+
+                except Exception as e:
+                    print(f"✗ Failed: freq={freq}, model={model_type}")
+                    print(f"Error: {e}")
+                    self.results[exp_key] = {"error": str(e)}
+                    sweep_summary[model_type].append({
+                        "frequency": freq,
+                        "model_type": model_type,
+                        "experiment_key": exp_key,
+                        "error": str(e),
+                    })
+
+        self._save_frequency_sweep_summary(sweep_summary)
+        return self.results
+
+    def _save_frequency_sweep_summary(self,
+                                      sweep_summary: Dict[str, List[Dict]]) -> None:
+        """Save and plot final loss versus frequency for a frequency sweep."""
+        summary_path = self.benchmark_dir / "frequency_sweep_summary.json"
+        with open(summary_path, 'w') as f:
+            json.dump(sweep_summary, f, indent=2, default=str)
+        print(f"\nFrequency sweep summary saved: {summary_path}")
+
+        plotter = Plotter(save_dir=self.benchmark_dir)
+        for model_type, rows in sweep_summary.items():
+            for row in rows:
+                if "final_loss" in row and "frequency" in row:
+                    plotter.log_frequency_loss(
+                        model_type,
+                        row["frequency"],
+                        row["final_loss"],
+                        row.get("experiment_key"),
+                    )
+        plotter.save_frequency_loss_log("frequency_loss_log.json")
+        plotter.plot_frequency_loss_log(save_name="frequency_sweep_final_loss.png")
+
     def lr_sweep(self, lrs: List[float], n_experiments: int = 5) -> Dict:
         """
         Learning rate sweep.
@@ -212,6 +310,42 @@ class BenchmarkSuite:
                 metrics,
                 save_name="metrics_comparison.png"
             )
+
+        self._log_frequency_losses(plotter)
+        plotter.save_frequency_loss_log()
+        plotter.plot_frequency_loss_log()
+
+    def _log_frequency_losses(self, plotter: Plotter) -> None:
+        """Collect final loss over frequency for configs that opt in."""
+        for exp_name, result in self.results.items():
+            if "error" in result or "history" not in result:
+                continue
+
+            config = result.get("config", {})
+            if isinstance(config, dict):
+                log_frequencies = config.get("log_frequencies", False)
+                pde_config = config.get("pde")
+            else:
+                log_frequencies = getattr(config, "log_frequencies", False)
+                pde_config = getattr(config, "pde", None)
+
+            if not log_frequencies:
+                continue
+
+            frequency = getattr(pde_config, "freq", None)
+            if frequency is None:
+                continue
+
+            history = np.array(result["history"])
+            if history.size == 0:
+                continue
+
+            plotter.log_frequency_loss(
+                result.get("model_type", "unknown"),
+                frequency,
+                history[-1, 0],
+                exp_name,
+            )
     
     def save_report(self, report: Dict) -> Path:
         """Save benchmark report to JSON."""
@@ -253,7 +387,7 @@ def main():
     parser = argparse.ArgumentParser(description="QPINN Benchmark Suite")
     parser.add_argument("--experiments", nargs="+", default=["baseline"],
                        help="Experiments to run (use 'all' for all available)")
-    parser.add_argument("--model-types", nargs="+", default=["qpinn"],
+    parser.add_argument("--model-types", nargs="+", default=None,
                        help="Model types to compare")
     parser.add_argument("--lr-sweep", action="store_true",
                        help="Run learning rate sweep instead")
@@ -261,6 +395,15 @@ def main():
                        help="Learning rates for sweep")
     parser.add_argument("--output-dir", type=str, default="./benchmarks",
                        help="Base output directory for benchmarks")
+
+    parser.add_argument("--freq-sweep", action="store_true",
+                        help="Run frequency sweep instead")
+
+    parser.add_argument("--freqs", nargs="+", type=float, default=None,
+                        help="Frequencies for sweep")
+    parser.add_argument("--epochs", type=int, default=None,
+                        help="Optional epoch override for sweeps")
+
     
     args = parser.parse_args()
     
@@ -270,6 +413,10 @@ def main():
     if args.lr_sweep:
         # Learning rate sweep
         suite.lr_sweep(args.lrs)
+
+    elif args.freq_sweep:
+        suite.freq_sweep(args.freqs, model_types=args.model_types, epochs=args.epochs)
+
     else:
         # Experiment sweep
         if "all" in args.experiments:

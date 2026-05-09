@@ -11,33 +11,36 @@ import math
 @dataclass
 class PDEConfig:
     """PDE-specific parameters (heat equation by default)."""
-    alpha: float = 0.1
+    freq: float = 0.5
+    alpha: float = 0.025
     x_min: float = 0.0
     x_max: float = 1.0
     t_min: float = 0.0
     t_max: float = 1.0
-    
+
     def exact_solution(self, x, t):
         """Return exact solution u(x,t)."""
         import torch
-        return torch.exp(-self.alpha * math.pi**2 * t) * torch.sin(math.pi * x)
-    
+        return torch.exp(-self.alpha *4* self.freq * self.freq * math.pi ** 2 * t) * torch.sin(
+            2 * self.freq * math.pi * x)
+
     def initial_condition(self, x):
         """Return IC: u(x, 0) = f(x)"""
         import torch
-        #return torch.sin(math.pi * x)
-        return torch.sin(math.pi * x)
-    
+        # return torch.sin(math.pi * x)
+        return torch.sin(2 * self.freq * math.pi * x)
+
     def boundary_condition_left(self, t):
         """Return BC: u(0, t) = g1(t)"""
         import torch
         return torch.zeros_like(t)
-    
+
     def boundary_condition_right(self, t):
         """Return BC: u(1, t) = g2(t)"""
         import torch
-        return torch.zeros_like(t)
-    
+        import numpy as np
+        return torch.zeros_like(t)*np.sin(2*np.pi*self.freq)
+
 
 @dataclass
 class BurgersEquationConfig(PDEConfig):
@@ -221,6 +224,7 @@ class ExperimentConfig:
     
     # Logging
     log_every: int = 25
+    log_frequencies: bool = False
     save_checkpoint: bool = False
     checkpoint_dir: str = "./checkpoints"
 
@@ -294,6 +298,15 @@ def feature_size_sweep(f: int) -> ExperimentConfig:
     cfg.name = f"feature_{f}"
     cfg.model.feature_size = f
     cfg.model.quantum_output_size = f
+    return cfg
+
+
+def freq_sweep(f: float) -> ExperimentConfig:
+    """Sweep over initial condition frequency."""
+    cfg = baseline_config()
+    cfg.name = f"freq_{f}"
+    cfg.pde.freq = f
+    cfg.log_frequencies = True
     return cfg
 
 def burgers_equation_config() -> ExperimentConfig:
@@ -399,6 +412,7 @@ EXPERIMENT_REGISTRY = {
     "feature_8": lambda: feature_size_sweep(8),
     "feature_16": lambda: feature_size_sweep(16),
 
+
     "freeze_quantum_config": freeze_quantum_config,
     "freeze_feature_map_config": freeze_feature_map_config,
 
@@ -407,6 +421,9 @@ EXPERIMENT_REGISTRY = {
     "wave_equation": wave_equation_config,
 }
 
+for i in range(1,15):  # 0.5 to 3 inclusive
+    f = float(i) / 4.0
+    EXPERIMENT_REGISTRY[f"freq{f:.2f}"] = (lambda f=f: freq_sweep(f))
 
 def get_config(experiment_name: str) -> ExperimentConfig:
     """Get configuration by name from registry."""
