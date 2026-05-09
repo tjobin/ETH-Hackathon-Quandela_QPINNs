@@ -281,7 +281,7 @@ class Evaluator:
         # Predict
         self.model.eval()
         with torch.no_grad():
-            U_pred, _, _ = self.model(xt_grid)
+            U_pred, _, *_ = self.model(xt_grid)
             U_pred = U_pred.reshape(nx, nt).cpu()
             
             # Exact solution

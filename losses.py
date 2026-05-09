@@ -124,7 +124,7 @@ class PhysicsLoss:
         Returns:
             residual: PDE residual tensor
         """
-        u, ux_hat, _ = model(xt_interior)
+        u, ux_hat, *_ = model(xt_interior)
         
         # Compute time and spatial derivatives
         grad_u = self.gradient(u, xt_interior)
@@ -151,7 +151,7 @@ class PhysicsLoss:
         Returns:
             residual: consistency residual tensor
         """
-        u, ux_hat, _ = model(xt_interior)
+        u, ux_hat, *_ = model(xt_interior)
         
         grad_u = self.gradient(u, xt_interior)
         u_x = grad_u[:, 0:1]
@@ -170,8 +170,10 @@ class PhysicsLoss:
         Returns:
             entropy: scalar tensor representing the average bipartite entanglement entropy
         """
-        _, _, entanglement_entropy = model(xt_interior)
-        return entanglement_entropy.mean()
+        _, _, *entanglement_entropy = model(xt_interior)
+        if not entanglement_entropy:
+            return torch.tensor(0.0, device=xt_interior.device, dtype=xt_interior.dtype)
+        return torch.tensor(entanglement_entropy).mean()
     
     def initial_condition_loss(self, model, xt_initial: torch.Tensor,
                                exact_fn=None) -> torch.Tensor:
@@ -188,7 +190,7 @@ class PhysicsLoss:
         Returns:
             loss: MSE loss at initial time
         """
-        u_pred, _, _ = model(xt_initial)
+        u_pred, _, *_ = model(xt_initial)
         x = xt_initial[:, 0:1]
         
         # Use the PDE's initial_condition method
@@ -209,7 +211,7 @@ class PhysicsLoss:
         Returns:
             loss: MSE loss at boundaries
         """
-        u_pred, _, _ = model(xt_boundary)
+        u_pred, _, *_ = model(xt_boundary)
         
         x = xt_boundary[:, 0:1]
         t = xt_boundary[:, 1:2]
@@ -293,7 +295,7 @@ class BurgersPhysicsLoss(PhysicsLoss):
         Compute Burgers PDE residual.
         du/dt + u*du/dx - nu*d²u/dx² = 0
         """
-        u, ux_hat = model(xt_interior)
+        u, ux_hat, *_ = model(xt_interior)
         
         # Get derivatives
         grad_u = self.gradient(u, xt_interior)
@@ -317,7 +319,7 @@ class WavePhysicsLoss(PhysicsLoss):
         Compute Wave PDE residual.
         d²u/dt² - c² * d²u/dx² = 0
         """
-        u, ux_hat = model(xt_interior)
+        u, ux_hat, *_ = model(xt_interior)
         
         # Get first derivatives
         grad_u = self.gradient(u, xt_interior)
