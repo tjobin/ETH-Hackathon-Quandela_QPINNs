@@ -1,0 +1,42 @@
+{
+  "timestamp": "2026-05-09T16:17:56.175361",
+  "num_experiments": 3,
+  "experiments": {
+    "baseline_classical": {
+      "rel_l2": 0.04918956011533737,
+      "mae": 0.01871870830655098,
+      "max_abs_error": 0.04879915714263916,
+      "rmse": 0.02283967100083828
+    },
+    "baseline_qpinn": {
+      "rel_l2": 0.038255080580711365,
+      "mae": 0.015034934505820274,
+      "max_abs_error": 0.03472977876663208,
+      "rmse": 0.017762579023838043
+    },
+    "baseline_qpinn_frozen": {
+      "rel_l2": 0.07321483641862869,
+      "mae": 0.02410021610558033,
+      "max_abs_error": 0.10147817432880402,
+      "rmse": 0.03399507328867912
+    }
+  },
+  "best_metrics": {
+    "rel_l2": {
+      "experiment": "baseline_qpinn",
+      "value": 0.038255080580711365
+    },
+    "mae": {
+      "experiment": "baseline_qpinn",
+      "value": 0.015034934505820274
+    },
+    "max_abs_error": {
+      "experiment": "baseline_qpinn",
+      "value": 0.03472977876663208
+    },
+    "rmse": {
+      "experiment": "baseline_qpinn",
+      "value": 0.017762579023838043
+    }
+  }
+}

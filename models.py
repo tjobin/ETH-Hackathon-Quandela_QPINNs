@@ -160,7 +160,9 @@ class ClassicalHeatQPINN(nn.Module):
             nn.Tanh(),
             nn.Linear(config.hidden_feature, config.feature_size),
             nn.Tanh(),
-            nn.Linear(config.feature_size, config.hidden_readout),
+            nn.Linear(config.feature_size,config.quantum_output_size),
+            nn.Tanh(),
+            nn.Linear(config.quantum_output_size, config.hidden_readout),
             nn.Tanh(),
             nn.Linear(config.hidden_readout, 2),  # [u, ux_hat]
         )
