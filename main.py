@@ -155,6 +155,7 @@ class Trainer:
                 loss_dict["consistency"],
                 loss_dict["initial"],
                 loss_dict["boundary"],
+                loss_dict["entropy"]
             ])
             
             # Logging
@@ -167,6 +168,7 @@ class Trainer:
                     f"Cons: {loss_dict['consistency']:.2e} | "
                     f"IC: {loss_dict['initial']:.2e} | "
                     f"BC: {loss_dict['boundary']:.2e} | "
+                    f"Entropy: {loss_dict['entropy']:.4f} | " # <-- NEW
                     f"Time: {elapsed:.1f}s"
                 )
         
@@ -241,7 +243,7 @@ class Evaluator:
         # Predict
         self.model.eval()
         with torch.no_grad():
-            U_pred, _ = self.model(xt_grid)
+            U_pred, _, _ = self.model(xt_grid)
             U_pred = U_pred.reshape(nx, nt).cpu()
             
             # Exact solution
@@ -261,6 +263,7 @@ class Evaluator:
             "mae": float(mae),
             "max_abs_error": float(max_abs_error),
             "rmse": float(rmse),
+            
         }
         
         print(f"Relative L2 error: {metrics['rel_l2']:.4e}")
@@ -329,13 +332,17 @@ def run_experiment(experiment_name: str, model_type: str = "qpinn",
     plotter.plot_solution_slices(U_true, U_pred, x_grid, t_grid,
                                 save_name="solution_slices.png")
     
+    # NEW: Plot the entropy
+    if history.shape[1] > 5: # Ensure entropy was actually tracked
+        plotter.plot_entropy_history(history, save_name="entropy_history.png")
+        
     # Save results
     results = {
         "experiment": config.name,
         "model_type": model_type,
         "config": config.__dict__,
         "metrics": metrics,
-        "history": history.tolist(),
+        "history": history.tolist()
     }
     
     results_path = Path(output_dir) / "results.json"

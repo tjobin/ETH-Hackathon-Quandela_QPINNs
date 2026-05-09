@@ -269,3 +269,29 @@ class Plotter:
             print(f"Saved: {path}")
         
         plt.show()
+        
+    def plot_entropy_history(self, history: np.ndarray, 
+                             figsize: Tuple[int, int] = (8, 4),
+                             save_name: Optional[str] = "entropy_history.png") -> None:
+        """
+        Plot Von Neumann Entanglement Entropy history.
+        Assumes entropy is stored at index 5 of the history array.
+        """
+        plt.figure(figsize=figsize)
+        
+        # History[:, 5] contains the entropy values we appended in Trainer
+        plt.plot(history[:, 5], color='purple', linewidth=2, label="Von Neumann Entropy (S)")
+        
+        plt.xlabel("Epoch", fontsize=12)
+        plt.ylabel("Entropy", fontsize=12)
+        plt.title("Bipartite Entanglement Entropy over Training", fontsize=14)
+        plt.legend(fontsize=10)
+        plt.grid(True, alpha=0.3)
+        plt.tight_layout()
+        
+        if save_name and self.save_dir:
+            path = self.save_dir / save_name
+            plt.savefig(path, dpi=150, bbox_inches='tight')
+            print(f"Saved: {path}")
+        
+        plt.show()

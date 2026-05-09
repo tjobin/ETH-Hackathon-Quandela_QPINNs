@@ -124,7 +124,7 @@ class PhysicsLoss:
         Returns:
             residual: PDE residual tensor
         """
-        u, ux_hat = model(xt_interior)
+        u, ux_hat, _ = model(xt_interior)
         
         # Compute time and spatial derivatives
         grad_u = self.gradient(u, xt_interior)
@@ -151,13 +151,27 @@ class PhysicsLoss:
         Returns:
             residual: consistency residual tensor
         """
-        u, ux_hat = model(xt_interior)
+        u, ux_hat, _ = model(xt_interior)
         
         grad_u = self.gradient(u, xt_interior)
         u_x = grad_u[:, 0:1]
         
         residual = u_x - ux_hat
         return residual
+    
+    def entropy(self, model, xt_interior: torch.Tensor) -> torch.Tensor:
+        """
+        Compute entanglement entropy from the quantum layer's output.
+        
+        Args:
+            model: neural network model
+            xt_interior: interior points with requires_grad=True
+        
+        Returns:
+            entropy: scalar tensor representing the average bipartite entanglement entropy
+        """
+        _, _, entanglement_entropy = model(xt_interior)
+        return entanglement_entropy.mean()
     
     def initial_condition_loss(self, model, xt_initial: torch.Tensor,
                                exact_fn) -> torch.Tensor:
@@ -172,7 +186,7 @@ class PhysicsLoss:
         Returns:
             loss: MSE loss at initial time
         """
-        u_pred, _ = model(xt_initial)
+        u_pred, _, _ = model(xt_initial)
         x = xt_initial[:, 0:1]
         t = xt_initial[:, 1:2]
         u_exact = exact_fn(x, t)
@@ -191,7 +205,7 @@ class PhysicsLoss:
         Returns:
             loss: MSE loss at boundaries (should be near zero)
         """
-        u_pred, _ = model(xt_boundary)
+        u_pred, _, _ = model(xt_boundary)
         return self.mse(u_pred, torch.zeros_like(u_pred))
     
     def total_loss(self, model, xt_f: torch.Tensor, xt_i: torch.Tensor,
@@ -232,12 +246,15 @@ class PhysicsLoss:
         total_loss = (lambda_f * loss_f + lambda_c * loss_c + 
                      lambda_i * loss_i + lambda_b * loss_b)
         
+        batch_entropy = self.entropy(model, xt_f)
+        
         loss_dict = {
             "total": total_loss.item(),
             "pde": loss_f.item(),
             "consistency": loss_c.item(),
             "initial": loss_i.item(),
             "boundary": loss_b.item(),
+            "entropy": batch_entropy.item()
         }
         
         return total_loss, loss_dict

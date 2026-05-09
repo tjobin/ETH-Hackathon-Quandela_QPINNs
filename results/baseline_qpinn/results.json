@@ -5,7 +5,7 @@
     "name": "baseline",
     "pde": "PDEConfig(alpha=0.1, x_min=0.0, x_max=1.0, t_min=0.0, t_max=1.0)",
     "data": "DataConfig(n_interior=64, n_initial=64, n_boundary=64, resample_each_epoch=True)",
-    "model": "ModelConfig(feature_size=4, quantum_output_size=4, hidden_feature=16, hidden_readout=16, use_hard_bc=True)",
+    "model": "ModelConfig(feature_size=4, quantum_output_size=4, hidden_feature=16, hidden_readout=16, use_hard_bc=True, quantum_type='simple')",
     "training": "TrainingConfig(epochs=300, learning_rate=0.01, optimizer_type='Adam', lambda_pde=1.0, lambda_consistency=0.1, lambda_initial=10.0, lambda_boundary=1.0, lr_decay=None, lr_decay_factor=0.1, lr_decay_steps=100)",
     "evaluation": "EvaluationConfig(nx=60, nt=60)",
     "seed": 1234,

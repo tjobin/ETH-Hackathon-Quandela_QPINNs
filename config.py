@@ -182,16 +182,34 @@ def lbfgs_config() -> ExperimentConfig:
     cfg.training.epochs = 100  # LBFGS typically converges faster
     return cfg
 
+def feature_size_sweep_deep_builder(f: int) -> ExperimentConfig:
+    """Sweep over feature map size."""
+    cfg = baseline_config()
+    cfg.name = f"feature_{f}_deep_builder"
+    cfg.model.feature_size = f
+    cfg.model.quantum_output_size = f
+    cfg.model = ModelConfig(
+        # The builder encodes data into exactly 2 modes (modes 0 and 1)
+        feature_size=f,              
+        # 4 modes with 3 photons yields C(4+3-1, 3) = 20 distinct Fock basis states
+        # The probs() measurement outputs a vector of this exact size
+        quantum_output_size=f,      
+        hidden_feature=16,
+        hidden_readout=16,
+        quantum_type="builder"       # Triggers the new model class
+    )
+    return cfg
+
 def deep_builder_config() -> ExperimentConfig:
     """Configuration for the 4-mode, 3-photon CircuitBuilder with data re-uploading."""
     cfg = baseline_config()
-    cfg.name = "deep_quantum_builder"
+    cfg.name = "feature_deepbuilder"
     cfg.model = ModelConfig(
         # The builder encodes data into exactly 2 modes (modes 0 and 1)
         feature_size=4,              
         # 4 modes with 3 photons yields C(4+3-1, 3) = 20 distinct Fock basis states
         # The probs() measurement outputs a vector of this exact size
-        quantum_output_size=4,      
+        quantum_output_size=20,      
         hidden_feature=16,
         hidden_readout=16,
         quantum_type="builder"       # Triggers the new model class
@@ -211,7 +229,7 @@ EXPERIMENT_REGISTRY = {
     "longer_training": longer_training_config,
     "low_consistency": low_consistency_config,
     "lbfgs": lbfgs_config,
-    "deep_builder": deep_builder_config,
+    #"deep_builder": deep_builder_config,
     
     "feature_2": lambda: feature_size_sweep(2),
     "feature_4": lambda: feature_size_sweep(4),
