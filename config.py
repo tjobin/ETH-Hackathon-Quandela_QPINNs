@@ -172,7 +172,7 @@ class ModelConfig:
     quantum_output_size: int = 4       # quantum layer output size
     hidden_feature: int = 16           # hidden layer for feature map
     hidden_readout: int = 16           # hidden layer for readout
-    use_hard_bc: bool = True           # enforce boundary conditions in architecture
+    use_hard_bc: bool = False           # enforce boundary conditions in architecture
     quantum_type: str = "simple"       # "simple" or "builder"
 
 
@@ -307,6 +307,7 @@ def freq_sweep(f: float) -> ExperimentConfig:
     cfg.name = f"freq_{f}"
     cfg.pde.freq = f
     cfg.log_frequencies = True
+    cfg.training.epochs = 600
     return cfg
 
 def burgers_equation_config() -> ExperimentConfig:

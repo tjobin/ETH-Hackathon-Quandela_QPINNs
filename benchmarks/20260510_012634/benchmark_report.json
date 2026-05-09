@@ -1,0 +1,150 @@
+{
+  "timestamp": "2026-05-10T01:27:30.304871",
+  "num_experiments": 28,
+  "experiments": {
+    "freq0.25_classical": {
+      "rel_l2": 0.3582928776741028,
+      "mae": 0.12332379817962646,
+      "max_abs_error": 1.0,
+      "rmse": 0.24573718011379242
+    },
+    "freq0.25_qpinn": {
+      "rel_l2": 0.3583493232727051,
+      "mae": 0.11935602873563766,
+      "max_abs_error": 1.0,
+      "rmse": 0.24577589333057404
+    },
+    "freq0.5_classical": {
+      "error": "Unknown experiment: freq0.5. Available: ['baseline', 'low_data', 'high_lambda_ic', 'quantum_large', 'longer_training', 'low_consistency', 'lbfgs', 'deep_builder', 'feature_2', 'feature_4', 'feature_8', 'feature_16', 'freeze_quantum_config', 'freeze_feature_map_config', 'burgers_equation', 'schrodinger_equation', 'wave_equation', 'freq0.25', 'freq0.50', 'freq0.75', 'freq1.00', 'freq1.25', 'freq1.50', 'freq1.75', 'freq2.00', 'freq2.25', 'freq2.50', 'freq2.75', 'freq3.00', 'freq3.25', 'freq3.50']"
+    },
+    "freq0.5_qpinn": {
+      "error": "Unknown experiment: freq0.5. Available: ['baseline', 'low_data', 'high_lambda_ic', 'quantum_large', 'longer_training', 'low_consistency', 'lbfgs', 'deep_builder', 'feature_2', 'feature_4', 'feature_8', 'feature_16', 'freeze_quantum_config', 'freeze_feature_map_config', 'burgers_equation', 'schrodinger_equation', 'wave_equation', 'freq0.25', 'freq0.50', 'freq0.75', 'freq1.00', 'freq1.25', 'freq1.50', 'freq1.75', 'freq2.00', 'freq2.25', 'freq2.50', 'freq2.75', 'freq3.00', 'freq3.25', 'freq3.50']"
+    },
+    "freq0.75_classical": {
+      "rel_l2": 0.3722746670246124,
+      "mae": 0.12950317561626434,
+      "max_abs_error": 1.0,
+      "rmse": 0.20474262535572052
+    },
+    "freq0.75_qpinn": {
+      "rel_l2": 0.3757380545139313,
+      "mae": 0.1136406660079956,
+      "max_abs_error": 1.0,
+      "rmse": 0.20664739608764648
+    },
+    "freq1.0_classical": {
+      "error": "Unknown experiment: freq1.0. Available: ['baseline', 'low_data', 'high_lambda_ic', 'quantum_large', 'longer_training', 'low_consistency', 'lbfgs', 'deep_builder', 'feature_2', 'feature_4', 'feature_8', 'feature_16', 'freeze_quantum_config', 'freeze_feature_map_config', 'burgers_equation', 'schrodinger_equation', 'wave_equation', 'freq0.25', 'freq0.50', 'freq0.75', 'freq1.00', 'freq1.25', 'freq1.50', 'freq1.75', 'freq2.00', 'freq2.25', 'freq2.50', 'freq2.75', 'freq3.00', 'freq3.25', 'freq3.50']"
+    },
+    "freq1.0_qpinn": {
+      "error": "Unknown experiment: freq1.0. Available: ['baseline', 'low_data', 'high_lambda_ic', 'quantum_large', 'longer_training', 'low_consistency', 'lbfgs', 'deep_builder', 'feature_2', 'feature_4', 'feature_8', 'feature_16', 'freeze_quantum_config', 'freeze_feature_map_config', 'burgers_equation', 'schrodinger_equation', 'wave_equation', 'freq0.25', 'freq0.50', 'freq0.75', 'freq1.00', 'freq1.25', 'freq1.50', 'freq1.75', 'freq2.00', 'freq2.25', 'freq2.50', 'freq2.75', 'freq3.00', 'freq3.25', 'freq3.50']"
+    },
+    "freq1.25_classical": {
+      "rel_l2": 0.6762372255325317,
+      "mae": 0.19665676355361938,
+      "max_abs_error": 1.0,
+      "rmse": 0.26752734184265137
+    },
+    "freq1.25_qpinn": {
+      "rel_l2": 0.4242367148399353,
+      "mae": 0.10217096656560898,
+      "max_abs_error": 1.0,
+      "rmse": 0.16783295571804047
+    },
+    "freq1.5_classical": {
+      "error": "Unknown experiment: freq1.5. Available: ['baseline', 'low_data', 'high_lambda_ic', 'quantum_large', 'longer_training', 'low_consistency', 'lbfgs', 'deep_builder', 'feature_2', 'feature_4', 'feature_8', 'feature_16', 'freeze_quantum_config', 'freeze_feature_map_config', 'burgers_equation', 'schrodinger_equation', 'wave_equation', 'freq0.25', 'freq0.50', 'freq0.75', 'freq1.00', 'freq1.25', 'freq1.50', 'freq1.75', 'freq2.00', 'freq2.25', 'freq2.50', 'freq2.75', 'freq3.00', 'freq3.25', 'freq3.50']"
+    },
+    "freq1.5_qpinn": {
+      "error": "Unknown experiment: freq1.5. Available: ['baseline', 'low_data', 'high_lambda_ic', 'quantum_large', 'longer_training', 'low_consistency', 'lbfgs', 'deep_builder', 'feature_2', 'feature_4', 'feature_8', 'feature_16', 'freeze_quantum_config', 'freeze_feature_map_config', 'burgers_equation', 'schrodinger_equation', 'wave_equation', 'freq0.25', 'freq0.50', 'freq0.75', 'freq1.00', 'freq1.25', 'freq1.50', 'freq1.75', 'freq2.00', 'freq2.25', 'freq2.50', 'freq2.75', 'freq3.00', 'freq3.25', 'freq3.50']"
+    },
+    "freq1.75_classical": {
+      "rel_l2": 0.6542866230010986,
+      "mae": 0.1320735216140747,
+      "max_abs_error": 1.0325562953948975,
+      "rmse": 0.1911899596452713
+    },
+    "freq1.75_qpinn": {
+      "rel_l2": 0.5498238205909729,
+      "mae": 0.12252863496541977,
+      "max_abs_error": 1.0,
+      "rmse": 0.16066476702690125
+    },
+    "freq2.0_classical": {
+      "error": "Unknown experiment: freq2.0. Available: ['baseline', 'low_data', 'high_lambda_ic', 'quantum_large', 'longer_training', 'low_consistency', 'lbfgs', 'deep_builder', 'feature_2', 'feature_4', 'feature_8', 'feature_16', 'freeze_quantum_config', 'freeze_feature_map_config', 'burgers_equation', 'schrodinger_equation', 'wave_equation', 'freq0.25', 'freq0.50', 'freq0.75', 'freq1.00', 'freq1.25', 'freq1.50', 'freq1.75', 'freq2.00', 'freq2.25', 'freq2.50', 'freq2.75', 'freq3.00', 'freq3.25', 'freq3.50']"
+    },
+    "freq2.0_qpinn": {
+      "error": "Unknown experiment: freq2.0. Available: ['baseline', 'low_data', 'high_lambda_ic', 'quantum_large', 'longer_training', 'low_consistency', 'lbfgs', 'deep_builder', 'feature_2', 'feature_4', 'feature_8', 'feature_16', 'freeze_quantum_config', 'freeze_feature_map_config', 'burgers_equation', 'schrodinger_equation', 'wave_equation', 'freq0.25', 'freq0.50', 'freq0.75', 'freq1.00', 'freq1.25', 'freq1.50', 'freq1.75', 'freq2.00', 'freq2.25', 'freq2.50', 'freq2.75', 'freq3.00', 'freq3.25', 'freq3.50']"
+    },
+    "freq2.25_classical": {
+      "rel_l2": 0.9493246674537659,
+      "mae": 0.1573677361011505,
+      "max_abs_error": 1.0027453899383545,
+      "rmse": 0.21954533457756042
+    },
+    "freq2.25_qpinn": {
+      "rel_l2": 0.8438133597373962,
+      "mae": 0.15561677515506744,
+      "max_abs_error": 1.0,
+      "rmse": 0.19514429569244385
+    },
+    "freq2.5_classical": {
+      "error": "Unknown experiment: freq2.5. Available: ['baseline', 'low_data', 'high_lambda_ic', 'quantum_large', 'longer_training', 'low_consistency', 'lbfgs', 'deep_builder', 'feature_2', 'feature_4', 'feature_8', 'feature_16', 'freeze_quantum_config', 'freeze_feature_map_config', 'burgers_equation', 'schrodinger_equation', 'wave_equation', 'freq0.25', 'freq0.50', 'freq0.75', 'freq1.00', 'freq1.25', 'freq1.50', 'freq1.75', 'freq2.00', 'freq2.25', 'freq2.50', 'freq2.75', 'freq3.00', 'freq3.25', 'freq3.50']"
+    },
+    "freq2.5_qpinn": {
+      "error": "Unknown experiment: freq2.5. Available: ['baseline', 'low_data', 'high_lambda_ic', 'quantum_large', 'longer_training', 'low_consistency', 'lbfgs', 'deep_builder', 'feature_2', 'feature_4', 'feature_8', 'feature_16', 'freeze_quantum_config', 'freeze_feature_map_config', 'burgers_equation', 'schrodinger_equation', 'wave_equation', 'freq0.25', 'freq0.50', 'freq0.75', 'freq1.00', 'freq1.25', 'freq1.50', 'freq1.75', 'freq2.00', 'freq2.25', 'freq2.50', 'freq2.75', 'freq3.00', 'freq3.25', 'freq3.50']"
+    },
+    "freq2.75_classical": {
+      "rel_l2": 0.9998000264167786,
+      "mae": 0.09161309897899628,
+      "max_abs_error": 1.0111744403839111,
+      "rmse": 0.19303786754608154
+    },
+    "freq2.75_qpinn": {
+      "rel_l2": 0.5918521285057068,
+      "mae": 0.07729659229516983,
+      "max_abs_error": 1.0,
+      "rmse": 0.11427270621061325
+    },
+    "freq3.0_classical": {
+      "error": "Unknown experiment: freq3.0. Available: ['baseline', 'low_data', 'high_lambda_ic', 'quantum_large', 'longer_training', 'low_consistency', 'lbfgs', 'deep_builder', 'feature_2', 'feature_4', 'feature_8', 'feature_16', 'freeze_quantum_config', 'freeze_feature_map_config', 'burgers_equation', 'schrodinger_equation', 'wave_equation', 'freq0.25', 'freq0.50', 'freq0.75', 'freq1.00', 'freq1.25', 'freq1.50', 'freq1.75', 'freq2.00', 'freq2.25', 'freq2.50', 'freq2.75', 'freq3.00', 'freq3.25', 'freq3.50']"
+    },
+    "freq3.0_qpinn": {
+      "error": "Unknown experiment: freq3.0. Available: ['baseline', 'low_data', 'high_lambda_ic', 'quantum_large', 'longer_training', 'low_consistency', 'lbfgs', 'deep_builder', 'feature_2', 'feature_4', 'feature_8', 'feature_16', 'freeze_quantum_config', 'freeze_feature_map_config', 'burgers_equation', 'schrodinger_equation', 'wave_equation', 'freq0.25', 'freq0.50', 'freq0.75', 'freq1.00', 'freq1.25', 'freq1.50', 'freq1.75', 'freq2.00', 'freq2.25', 'freq2.50', 'freq2.75', 'freq3.00', 'freq3.25', 'freq3.50']"
+    },
+    "freq3.25_classical": {
+      "rel_l2": 1.0044761896133423,
+      "mae": 0.07480158656835556,
+      "max_abs_error": 1.0209323167800903,
+      "rmse": 0.1680605709552765
+    },
+    "freq3.25_qpinn": {
+      "rel_l2": 1.0006382465362549,
+      "mae": 0.0685477927327156,
+      "max_abs_error": 1.009551763534546,
+      "rmse": 0.16741852462291718
+    },
+    "freq3.5_classical": {
+      "error": "Unknown experiment: freq3.5. Available: ['baseline', 'low_data', 'high_lambda_ic', 'quantum_large', 'longer_training', 'low_consistency', 'lbfgs', 'deep_builder', 'feature_2', 'feature_4', 'feature_8', 'feature_16', 'freeze_quantum_config', 'freeze_feature_map_config', 'burgers_equation', 'schrodinger_equation', 'wave_equation', 'freq0.25', 'freq0.50', 'freq0.75', 'freq1.00', 'freq1.25', 'freq1.50', 'freq1.75', 'freq2.00', 'freq2.25', 'freq2.50', 'freq2.75', 'freq3.00', 'freq3.25', 'freq3.50']"
+    },
+    "freq3.5_qpinn": {
+      "error": "Unknown experiment: freq3.5. Available: ['baseline', 'low_data', 'high_lambda_ic', 'quantum_large', 'longer_training', 'low_consistency', 'lbfgs', 'deep_builder', 'feature_2', 'feature_4', 'feature_8', 'feature_16', 'freeze_quantum_config', 'freeze_feature_map_config', 'burgers_equation', 'schrodinger_equation', 'wave_equation', 'freq0.25', 'freq0.50', 'freq0.75', 'freq1.00', 'freq1.25', 'freq1.50', 'freq1.75', 'freq2.00', 'freq2.25', 'freq2.50', 'freq2.75', 'freq3.00', 'freq3.25', 'freq3.50']"
+    }
+  },
+  "best_metrics": {
+    "rel_l2": {
+      "experiment": "freq0.25_classical",
+      "value": 0.3582928776741028
+    },
+    "mae": {
+      "experiment": "freq3.25_qpinn",
+      "value": 0.0685477927327156
+    },
+    "max_abs_error": {
+      "experiment": "freq0.25_classical",
+      "value": 1.0
+    },
+    "rmse": {
+      "experiment": "freq2.75_qpinn",
+      "value": 0.11427270621061325
+    }
+  }
+}
