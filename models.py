@@ -268,6 +268,7 @@ class BuilderMerlinHeatQPINN(nn.Module):
 
             # 2. Add multiple processing layers (depth)
             depth = config.quantum_depth # or config.quantum_depth
+
             for _ in range(depth):
                 builder.add_entangling_layer(trainable=True, model="mzi")
 
@@ -297,7 +298,7 @@ class BuilderMerlinHeatQPINN(nn.Module):
             nn.Linear(config.hidden_readout, 2),
         )
         # Precompute the index mapping for the partial trace (Subsystem A: modes 0,1)
-        self._setup_partial_trace(photons=3, modes=4, subsys_A_size=2)
+        self._setup_partial_trace(photons=config.n_photons, modes=config.feature_size, subsys_A_size=2)
         
     def _setup_partial_trace(self, photons: int, modes: int, subsys_A_size: int):
         """Prepares the index map for tracing out Subsystem B."""
