@@ -410,7 +410,7 @@ EXPERIMENT_REGISTRY = {
     "longer_training": longer_training_config,
     "low_consistency": low_consistency_config,
     "lbfgs": lbfgs_config,
-    #"deep_builder": deep_builder_config,
+    "deep_builder": deep_builder_config,
     
     "feature_2": lambda: feature_size_sweep(2),
     "feature_4": lambda: feature_size_sweep(4),

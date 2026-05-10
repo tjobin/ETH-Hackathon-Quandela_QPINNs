@@ -21,6 +21,8 @@ from config import ExperimentConfig, get_config, list_experiments
 from models import create_model, MerlinHeatQPINN
 from losses import DataSampler, PhysicsLoss
 from plotter import Plotter
+import scaleway.quantum as scw
+
 
 
 class Trainer:
