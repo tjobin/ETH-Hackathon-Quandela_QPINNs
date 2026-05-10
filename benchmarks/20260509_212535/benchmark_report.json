@@ -1,0 +1,48 @@
+{
+  "timestamp": "2026-05-09T21:30:40.904319",
+  "num_experiments": 4,
+  "experiments": {
+    "freq_sweep_freq0.5": {
+      "rel_l2": 0.03825516626238823,
+      "mae": 0.01503496803343296,
+      "max_abs_error": 0.034729987382888794,
+      "rmse": 0.01776261255145073
+    },
+    "freq_sweep_freq1.0": {
+      "rel_l2": 0.2229333519935608,
+      "mae": 0.0446418896317482,
+      "max_abs_error": 0.14944738149642944,
+      "rmse": 0.05701158568263054
+    },
+    "freq_sweep_freq1.5": {
+      "rel_l2": 0.8625974059104919,
+      "mae": 0.11703747510910034,
+      "max_abs_error": 0.40858194231987,
+      "rmse": 0.15313705801963806
+    },
+    "freq_sweep_freq2.0": {
+      "rel_l2": 0.9405225515365601,
+      "mae": 0.09253525733947754,
+      "max_abs_error": 0.5360784530639648,
+      "rmse": 0.13224008679389954
+    }
+  },
+  "best_metrics": {
+    "rel_l2": {
+      "experiment": "freq_sweep_freq0.5",
+      "value": 0.03825516626238823
+    },
+    "mae": {
+      "experiment": "freq_sweep_freq0.5",
+      "value": 0.01503496803343296
+    },
+    "max_abs_error": {
+      "experiment": "freq_sweep_freq0.5",
+      "value": 0.034729987382888794
+    },
+    "rmse": {
+      "experiment": "freq_sweep_freq0.5",
+      "value": 0.01776261255145073
+    }
+  }
+}

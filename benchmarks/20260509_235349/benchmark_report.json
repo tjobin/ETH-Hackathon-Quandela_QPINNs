@@ -1,0 +1,55 @@
+{
+  "timestamp": "2026-05-09T23:53:51.791450",
+  "num_experiments": 16,
+  "experiments": {
+    "freq0.5_classical": {
+      "error": "exp(): argument 'input' (position 1) must be Tensor, not float"
+    },
+    "freq0.5_qpinn": {
+      "error": "exp(): argument 'input' (position 1) must be Tensor, not float"
+    },
+    "freq0.7_classical": {
+      "error": "exp(): argument 'input' (position 1) must be Tensor, not float"
+    },
+    "freq0.7_qpinn": {
+      "error": "exp(): argument 'input' (position 1) must be Tensor, not float"
+    },
+    "freq1.0_classical": {
+      "error": "exp(): argument 'input' (position 1) must be Tensor, not float"
+    },
+    "freq1.0_qpinn": {
+      "error": "exp(): argument 'input' (position 1) must be Tensor, not float"
+    },
+    "freq1.2_classical": {
+      "error": "exp(): argument 'input' (position 1) must be Tensor, not float"
+    },
+    "freq1.2_qpinn": {
+      "error": "exp(): argument 'input' (position 1) must be Tensor, not float"
+    },
+    "freq1.5_classical": {
+      "error": "exp(): argument 'input' (position 1) must be Tensor, not float"
+    },
+    "freq1.5_qpinn": {
+      "error": "exp(): argument 'input' (position 1) must be Tensor, not float"
+    },
+    "freq1.7_classical": {
+      "error": "exp(): argument 'input' (position 1) must be Tensor, not float"
+    },
+    "freq1.7_qpinn": {
+      "error": "exp(): argument 'input' (position 1) must be Tensor, not float"
+    },
+    "freq2.0_classical": {
+      "error": "exp(): argument 'input' (position 1) must be Tensor, not float"
+    },
+    "freq2.0_qpinn": {
+      "error": "exp(): argument 'input' (position 1) must be Tensor, not float"
+    },
+    "freq2.2_classical": {
+      "error": "exp(): argument 'input' (position 1) must be Tensor, not float"
+    },
+    "freq2.2_qpinn": {
+      "error": "exp(): argument 'input' (position 1) must be Tensor, not float"
+    }
+  },
+  "best_metrics": {}
+}

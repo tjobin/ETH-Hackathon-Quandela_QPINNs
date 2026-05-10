@@ -456,8 +456,8 @@ class BenchmarkSuite:
 
         x = np.arange(len(exp_names))
         width = 0.35
-        bars1 = ax2.bar(x - width/2, final_low, width, label='Low Freq', alpha=0.8, color='green')
-        bars2 = ax2.bar(x + width/2, final_high, width, label='High Freq', alpha=0.8, color='red')
+        bars1 = ax2.bar(x - width / 2, final_low, width, label='Low Freq', alpha=0.8, color='green')
+        bars2 = ax2.bar(x + width / 2, final_high, width, label='High Freq', alpha=0.8, color='red')
 
         ax2.set_ylabel('Error', fontsize=12)
         ax2.set_title('Final Epoch: Low vs High Frequency Error', fontsize=13)
@@ -471,7 +471,7 @@ class BenchmarkSuite:
         for bars in [bars1, bars2]:
             for bar in bars:
                 height = bar.get_height()
-                ax2.text(bar.get_x() + bar.get_width()/2., height,
+                ax2.text(bar.get_x() + bar.get_width() / 2., height,
                          f'{height:.2e}', ha='center', va='bottom', fontsize=9)
 
         plt.tight_layout()
@@ -498,7 +498,7 @@ class BenchmarkSuite:
                 # Add value labels on bars
                 for bar in bars:
                     height = bar.get_height()
-                    ax.text(bar.get_x() + bar.get_width()/2., height,
+                    ax.text(bar.get_x() + bar.get_width() / 2., height,
                             f'{height:.2e}', ha='center', va='bottom', fontsize=9)
 
                 ax.grid(True, alpha=0.3, axis='y')
@@ -532,7 +532,7 @@ class BenchmarkSuite:
 
                         # Keep only positive frequencies
                         nx = U_true.shape[0]
-                        u_true_hat = u_true_hat[:nx//2, :]
+                        u_true_hat = u_true_hat[:nx // 2, :]
 
                         # Compute energy per mode: |û[k,:]|²
                         energy_per_mode = torch.sum(torch.abs(u_true_hat) ** 2, dim=1)
@@ -565,8 +565,8 @@ class BenchmarkSuite:
             ax1.grid(True, alpha=0.3, which='both')
 
             # Add shading for low/high frequency regions
-            ax1.axvspan(0, nx//4, alpha=0.1, color='green', label='Low Freq (0-25%)')
-            ax1.axvspan(3*nx//4, nx//2, alpha=0.1, color='red', label='High Freq (75-100%)')
+            ax1.axvspan(0, nx // 4, alpha=0.1, color='green', label='Low Freq (0-25%)')
+            ax1.axvspan(3 * nx // 4, nx // 2, alpha=0.1, color='red', label='High Freq (75-100%)')
             ax1.legend(fontsize=10)
 
             # Plot 2: Cumulative energy
@@ -582,8 +582,8 @@ class BenchmarkSuite:
             ax2.legend(fontsize=10)
 
             # Add shading for low/high frequency regions
-            ax2.axvspan(0, nx//4, alpha=0.1, color='green', label='Low Freq')
-            ax2.axvspan(3*nx//4, nx//2, alpha=0.1, color='red', label='High Freq')
+            ax2.axvspan(0, nx // 4, alpha=0.1, color='green', label='Low Freq')
+            ax2.axvspan(3 * nx // 4, nx // 2, alpha=0.1, color='red', label='High Freq')
 
             plt.tight_layout()
             save_path = self.benchmark_dir / "fourier_energy_distribution.png"
@@ -596,7 +596,6 @@ class BenchmarkSuite:
         self._plot_mode_l2_comparisons(fourier_plotter)
 
         print("Fourier spectral comparisons complete!")
-
 
     def _plot_mode_l2_comparisons(self, fourier_plotter):
         """
@@ -644,8 +643,8 @@ class BenchmarkSuite:
 
                         # Keep only positive frequencies [0:nx//2]
                         nx = U_pred.shape[0]
-                        u_pred_hat = u_pred_hat[:nx//2, :]
-                        u_true_hat = u_true_hat[:nx//2, :]
+                        u_pred_hat = u_pred_hat[:nx // 2, :]
+                        u_true_hat = u_true_hat[:nx // 2, :]
 
                         # L2 error for each mode
                         mode_errors = torch.norm(u_pred_hat - u_true_hat, dim=1)

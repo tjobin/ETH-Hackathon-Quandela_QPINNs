@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-05-09T21:58:05.562847",
+  "num_experiments": 4,
+  "experiments": {
+    "freq0.5_classical": {
+      "error": "'ExperimentConfig' object is not callable"
+    },
+    "freq0.5_qpinn": {
+      "error": "'ExperimentConfig' object is not callable"
+    },
+    "freq1.0_classical": {
+      "error": "'ExperimentConfig' object is not callable"
+    },
+    "freq1.0_qpinn": {
+      "error": "'ExperimentConfig' object is not callable"
+    }
+  },
+  "best_metrics": {}
+}

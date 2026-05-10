@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-05-09T21:57:47.354357",
+  "num_experiments": 4,
+  "experiments": {
+    "freq0.5_classical": {
+      "error": "'ExperimentConfig' object is not callable"
+    },
+    "freq0.5_qpinn": {
+      "error": "'ExperimentConfig' object is not callable"
+    },
+    "freq1_classical": {
+      "error": "Unknown experiment: freq1. Available: ['baseline', 'low_data', 'high_lambda_ic', 'quantum_large', 'longer_training', 'low_consistency', 'lbfgs', 'deep_builder', 'feature_2', 'feature_4', 'feature_8', 'feature_16', 'freq0.5', 'freq1.0', 'freq1.5', 'freq2.0', 'freeze_quantum_config', 'freeze_feature_map_config', 'burgers_equation', 'schrodinger_equation', 'wave_equation']"
+    },
+    "freq1_qpinn": {
+      "error": "Unknown experiment: freq1. Available: ['baseline', 'low_data', 'high_lambda_ic', 'quantum_large', 'longer_training', 'low_consistency', 'lbfgs', 'deep_builder', 'feature_2', 'feature_4', 'feature_8', 'feature_16', 'freq0.5', 'freq1.0', 'freq1.5', 'freq2.0', 'freeze_quantum_config', 'freeze_feature_map_config', 'burgers_equation', 'schrodinger_equation', 'wave_equation']"
+    }
+  },
+  "best_metrics": {}
+}
