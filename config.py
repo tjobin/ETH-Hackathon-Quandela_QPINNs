@@ -174,7 +174,7 @@ class ModelConfig:
     hidden_readout: int = 16           # hidden layer for readout
     use_hard_bc: bool = False           # enforce boundary conditions in architecture
     quantum_type: str = "simple"       # "simple" or "builder"
-
+    quantum_depth: int = 1             # number of data re-upload blocks
 
 @dataclass
 class TrainingConfig:
@@ -203,8 +203,8 @@ class TrainingConfig:
 @dataclass
 class EvaluationConfig:
     """Evaluation grid parameters."""
-    nx: int = 60
-    nt: int = 60
+    nx: int = 120
+    nt: int = 120
 
 
 @dataclass
@@ -308,6 +308,7 @@ def freq_sweep(f: float) -> ExperimentConfig:
     cfg.pde.freq = f
     cfg.log_frequencies = True
     cfg.training.epochs = 600
+
     return cfg
 
 def burgers_equation_config() -> ExperimentConfig:
@@ -337,7 +338,7 @@ def wave_equation_config() -> ExperimentConfig:
     cfg = baseline_config()
     cfg.name = "wave_equation"
     cfg.pde = WaveEquationConfig(c=1.0)
-    cfg.training.epochs = 2000
+    cfg.training.epochs = 1000
     cfg.training.lambda_initial = 15.0  # Higher IC weight
     return cfg
 
@@ -411,6 +412,13 @@ def deep_builder_config() -> ExperimentConfig:
     )
     return cfg
 
+def reupload_depth_config(depth: int) -> ExperimentConfig:
+    """QPINN with repeated data re-uploading blocks before one measurement."""
+    cfg = baseline_config()
+    cfg.name = f"reupload_depth_{depth}"
+    cfg.model.quantum_depth = depth
+    return cfg
+
 
 # ============================================================================
 # Config Registry for Easy Access
@@ -438,9 +446,14 @@ EXPERIMENT_REGISTRY = {
     "burgers_equation": burgers_equation_config,
     "schrodinger_equation": schrodinger_equation_config,
     "wave_equation": wave_equation_config,
+
+    "reupload_depth_1": lambda: reupload_depth_config(1),
+    "reupload_depth_2": lambda: reupload_depth_config(2),
+    "reupload_depth_3": lambda: reupload_depth_config(3),
+    "reupload_depth_4": lambda: reupload_depth_config(4),
 }
 
-for i in range(1,15):  # 0.5 to 3 inclusive
+for i in range(1,20):  # 0.5 to 3 inclusive
     f = float(i) / 4.0
     EXPERIMENT_REGISTRY[f"freq{f:.2f}"] = (lambda f=f: freq_sweep(f))
 

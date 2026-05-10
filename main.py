@@ -93,6 +93,13 @@ class Trainer:
     
     def _create_optimizer(self) -> torch.optim.Optimizer:
         """Create optimizer based on config."""
+        # Count trainable parameters
+        trainable_params = [p for p in self.model.parameters() if p.requires_grad]
+        
+        if len(trainable_params) == 0:
+            print("⚠️  Model has no trainable parameters (e.g., FiniteDifferenceSolver)")
+            print("   Skipping optimizer initialization")
+            return None
         opt_type = self.config.training.optimizer_type.lower()
         
         if opt_type == "adam":
@@ -165,7 +172,9 @@ class Trainer:
         
         for epoch in range(1, self.config.training.epochs + 1):
             self.model.train()
-            self.optimizer.zero_grad()
+            
+            if self.optimizer is not None: #FOR FD_SOLVER
+                self.optimizer.zero_grad()
             
             # Sample data
             xt_f = self.sampler.sample_interior()
@@ -183,8 +192,9 @@ class Trainer:
             )
             
             # Backward pass
-            loss.backward()
-            self.optimizer.step()
+            if self.optimizer is not None: ###FOR FD_SOLVER
+                loss.backward()
+                self.optimizer.step()
             
             # Learning rate scheduling
             if self.scheduler is not None:
@@ -470,7 +480,7 @@ def main():
     parser.add_argument("--experiment", type=str, default="baseline",
                        help="Experiment configuration to run")
     parser.add_argument("--model-type", type=str, default="qpinn",
-                       choices=["qpinn", "qpinn_frozen", "classical", "deep_classical"],
+                       choices=["qpinn", "qpinn_frozen", "classical", "deep_classical","reupload_qpinn", "reupload_classical","fd_solver", "qpinn_builder"],
                        help="Model type to use")
     parser.add_argument("--output-dir", type=str, default=None,
                        help="Output directory for results")

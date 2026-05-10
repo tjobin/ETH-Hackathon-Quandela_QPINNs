@@ -14,6 +14,7 @@ from typing import List, Dict
 import numpy as np
 from datetime import datetime
 import matplotlib.pyplot as plt
+import re
 
 from config import list_experiments, freq_sweep
 from main import run_experiment, run_config
@@ -317,7 +318,7 @@ class BenchmarkSuite:
 
         self._log_frequency_losses(plotter)
         plotter.save_frequency_loss_log()
-        plotter.plot_frequency_loss_log()
+        #plotter.plot_frequency_loss_log()
 
     def _log_frequency_losses(self, plotter: Plotter) -> None:
         """Collect final loss over frequency for configs that opt in."""
@@ -375,13 +376,18 @@ class BenchmarkSuite:
             return
 
         exp_names = list(fourier_histories.keys())
+        
+        # Define markers and colors for different models
+        markers = ['o', 's', '^', 'd', 'v', 'p', '*']
+        colors = plt.cm.Set1(np.linspace(0, 1, len(exp_names)))
 
         # 1. Spectral L2 error evolution comparison
         fig, ax = plt.subplots(figsize=(12, 6))
-        for exp_name, history in fourier_histories.items():
+        for idx, (exp_name, history) in enumerate(fourier_histories.items()):
             epochs = np.array([m['epoch'] for m in history])
             spectral_l2 = np.array([m['spectral_l2'] for m in history])
-            ax.semilogy(epochs, spectral_l2, 'o-', label=exp_name, linewidth=2.5, markersize=5)
+            ax.semilogy(epochs, spectral_l2, marker=markers[idx % len(markers)], 
+                       label=exp_name, linewidth=2.5, markersize=6, color=colors[idx], alpha=0.8)
         ax.set_xlabel('Epoch', fontsize=12)
         ax.set_ylabel('Spectral L2 Error', fontsize=12)
         ax.set_title('Spectral L2 Error Comparison Across Experiments', fontsize=13)
@@ -395,10 +401,11 @@ class BenchmarkSuite:
 
         # 2. Power spectrum error evolution
         fig, ax = plt.subplots(figsize=(12, 6))
-        for exp_name, history in fourier_histories.items():
+        for idx, (exp_name, history) in enumerate(fourier_histories.items()):
             epochs = np.array([m['epoch'] for m in history])
             power_error = np.array([m['power_spectrum_error'] for m in history])
-            ax.semilogy(epochs, power_error, 's-', label=exp_name, linewidth=2.5, markersize=5)
+            ax.semilogy(epochs, power_error, marker=markers[idx % len(markers)],
+                       label=exp_name, linewidth=2.5, markersize=6, color=colors[idx], alpha=0.8)
         ax.set_xlabel('Epoch', fontsize=12)
         ax.set_ylabel('Power Spectrum Error', fontsize=12)
         ax.set_title('Power Spectrum Error Comparison', fontsize=13)
@@ -412,10 +419,11 @@ class BenchmarkSuite:
 
         # 3. Spectral concentration (smoothness) comparison
         fig, ax = plt.subplots(figsize=(12, 6))
-        for exp_name, history in fourier_histories.items():
+        for idx, (exp_name, history) in enumerate(fourier_histories.items()):
             epochs = np.array([m['epoch'] for m in history])
             conc_pred = np.array([m['concentration_pred'] for m in history])
-            ax.plot(epochs, conc_pred, 'o-', label=exp_name, linewidth=2.5, markersize=5)
+            ax.plot(epochs, conc_pred, marker=markers[idx % len(markers)],
+                   label=exp_name, linewidth=2.5, markersize=6, color=colors[idx], alpha=0.8)
         ax.set_xlabel('Epoch', fontsize=12)
         ax.set_ylabel('Spectral Concentration', fontsize=12)
         ax.set_title('Solution Smoothness (Spectral Concentration) Comparison', fontsize=13)
@@ -428,16 +436,19 @@ class BenchmarkSuite:
         plt.close()
         print(f"  ✓ fourier_concentration_comparison.png")
 
-        # 4. Low vs High frequency error (FINAL EPOCH comparison)
+        # 4. Low vs High frequency error
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
 
         # Left: Evolution during training
-        for exp_name, history in fourier_histories.items():
+        for idx, (exp_name, history) in enumerate(fourier_histories.items()):
             epochs = np.array([m['epoch'] for m in history])
             low_freq = np.array([m['low_freq_error'] for m in history])
             high_freq = np.array([m['high_freq_error'] for m in history])
-            ax1.semilogy(epochs, low_freq, 'o-', label=f'{exp_name} (Low)', linewidth=2, markersize=4)
-            ax1.semilogy(epochs, high_freq, 's--', label=f'{exp_name} (High)', linewidth=2, markersize=4, alpha=0.7)
+            marker = markers[idx % len(markers)]
+            ax1.semilogy(epochs, low_freq, marker=marker, label=f'{exp_name} (Low)', 
+                       linewidth=2, markersize=5, color=colors[idx], alpha=0.8)
+            ax1.semilogy(epochs, high_freq, marker=marker, label=f'{exp_name} (High)',
+                       linewidth=2, linestyle='--', markersize=5, color=colors[idx], alpha=0.6)
         ax1.set_xlabel('Epoch', fontsize=12)
         ax1.set_ylabel('Error', fontsize=12)
         ax1.set_title('Low vs High Frequency Error Evolution During Training', fontsize=13)
@@ -445,7 +456,6 @@ class BenchmarkSuite:
         ax1.grid(True, alpha=0.3)
 
         # Right: Final epoch comparison (bar chart)
-        exp_names = list(fourier_histories.keys())
         final_low = []
         final_high = []
         for exp_name in exp_names:
@@ -490,7 +500,7 @@ class BenchmarkSuite:
             for idx, metric in enumerate(metrics_to_plot):
                 ax = axes[idx]
                 values = [final_metrics[exp].get(metric, 0) for exp in exp_names]
-                bars = ax.bar(exp_names, values, alpha=0.7, color=plt.cm.Set2(idx))
+                bars = ax.bar(exp_names, values, alpha=0.7, color=colors)
                 ax.set_ylabel(metric.replace('_', ' ').title(), fontsize=11)
                 ax.set_title(f'Final {metric.replace("_", " ").title()}', fontsize=12)
                 ax.tick_params(axis='x', rotation=45)
@@ -613,7 +623,6 @@ class BenchmarkSuite:
         Loads solutions from numpy files saved during individual runs.
         """
         import torch
-        import numpy as np
 
         print("  Computing mode L2 errors from individual runs...")
 
@@ -665,8 +674,20 @@ class BenchmarkSuite:
             print("  No mode error data available")
             return
 
-        # Create overlay plots
+        # Create overlay plots with markers and colors
+        markers = ['o', 's', '^', 'd', 'v', 'p', '*']
         colors = plt.cm.Set1(np.linspace(0, 1, len(mode_errors_dict)))
+
+#        # Extract frequency from experiment name
+#        freq_match = re.search(r'freq([0-9p.]+)', exp_name)
+#        frequency = freq_match.group(1).replace('p', '.') if freq_match else 'baseline'
+#
+#        # Create color map by frequency
+#        unique_freqs = sorted(list(set(data.get('frequency', 'baseline') for data in mode_errors_dict.values())))
+#        freq_to_color = {freq: plt.cm.Set1(i / len(unique_freqs)) for i, freq in enumerate(unique_freqs)}
+#
+#        # All models with same frequency get same color
+#        colors = freq_to_color[data.get('frequency', 'baseline')]
 
         # Get number of modes (already positive frequencies only)
         n_modes = list(mode_errors_dict.values())[0]['mode_errors'].shape[0]
@@ -675,8 +696,8 @@ class BenchmarkSuite:
         # Plot 1: Absolute L2 error vs k (semi-log)
         fig, ax = plt.subplots(figsize=(12, 6))
         for idx, (exp_name, data) in enumerate(mode_errors_dict.items()):
-            ax.semilogy(modes, data['mode_errors'], 'o-', label=exp_name,
-                        linewidth=2.5, markersize=5, color=colors[idx])
+            ax.semilogy(modes, data['mode_errors'], marker=markers[idx % len(markers)], 
+                       label=exp_name, linewidth=2.5, markersize=6, color=colors[idx], alpha=0.8)
 
         ax.set_xlabel('Mode Index k', fontsize=12)
         ax.set_ylabel('L2 Error: ||û_pred[k,:] - û_true[k,:]||', fontsize=12)
@@ -691,10 +712,22 @@ class BenchmarkSuite:
         print(f"  ✓ fourier_mode_l2_vs_k_overlay.png")
 
         # Plot 2: Log-Log scale
+        def _extract_exp_label(exp_name: str) -> str:
+            # Handle 'freq1p5_classical' → '$\lambda = 1.5$ (Classical)'
+            freq_match = re.search(r'freq([0-9p.]+)_(classical|qpinn)', exp_name)
+            if freq_match:
+                lambda_str = freq_match.group(1)
+                lambda_val = lambda_str.replace('p', '.')
+                model = freq_match.group(2).capitalize()
+                return f'$f = {lambda_val}$ ({model})'
+
         fig, ax = plt.subplots(figsize=(12, 6))
+
         for idx, (exp_name, data) in enumerate(mode_errors_dict.items()):
-            ax.loglog(modes[1:], data['mode_errors'][1:], 'o-', label=exp_name,
-                      linewidth=2.5, markersize=5, color=colors[idx])
+            #marker = 'o' if 'classical' in exp_name else 's'
+            marker = 'o' if re.search(r'_classical$', exp_name) else 's'
+            ax.loglog(modes[1:], data['mode_errors'][1:], marker=marker,
+                     label=_extract_exp_label(exp_name), linewidth=2.5, markersize=6, color=colors[idx], alpha=0.8)
 
         ax.set_xlabel('Mode Index k (log)', fontsize=12)
         ax.set_ylabel('L2 Error (log)', fontsize=12)
@@ -711,8 +744,9 @@ class BenchmarkSuite:
         # Plot 3: Relative error vs k
         fig, ax = plt.subplots(figsize=(12, 6))
         for idx, (exp_name, data) in enumerate(mode_errors_dict.items()):
-            ax.semilogy(modes, data['relative_errors'], 's-', label=exp_name,
-                        linewidth=2.5, markersize=5, color=colors[idx])
+            marker = 'o' if 'classical' in exp_name else 's'
+            ax.semilogy(modes, data['relative_errors'], marker=markers[idx % len(markers)],
+                       label=exp_name, linewidth=2.5, markersize=6, color=colors[idx], alpha=0.8)
 
         ax.set_xlabel('Mode Index k', fontsize=12)
         ax.set_ylabel('Relative L2 Error', fontsize=12)
@@ -725,6 +759,7 @@ class BenchmarkSuite:
         plt.savefig(save_path, dpi=150, bbox_inches='tight')
         plt.close()
         print(f"  ✓ fourier_mode_relative_error_overlay.png")
+
     def save_report(self, report: Dict) -> Path:
         """Save benchmark report to JSON."""
         report_path = self.benchmark_dir / "benchmark_report.json"

@@ -1,0 +1,33 @@
+{
+  "timestamp": "2026-05-10T09:02:25.114412",
+  "num_experiments": 2,
+  "experiments": {
+    "baseline_fd_solver": {
+      "error": "'ModelConfig' object has no attribute 'pde'"
+    },
+    "baseline_classical": {
+      "rel_l2": 0.019852399826049805,
+      "mae": 0.011270239017903805,
+      "max_abs_error": 0.023104187101125717,
+      "rmse": 0.012369231320917606
+    }
+  },
+  "best_metrics": {
+    "rel_l2": {
+      "experiment": "baseline_classical",
+      "value": 0.019852399826049805
+    },
+    "mae": {
+      "experiment": "baseline_classical",
+      "value": 0.011270239017903805
+    },
+    "max_abs_error": {
+      "experiment": "baseline_classical",
+      "value": 0.023104187101125717
+    },
+    "rmse": {
+      "experiment": "baseline_classical",
+      "value": 0.012369231320917606
+    }
+  }
+}

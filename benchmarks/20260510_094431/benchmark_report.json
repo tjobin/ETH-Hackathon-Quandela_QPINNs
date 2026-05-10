@@ -1,0 +1,36 @@
+{
+  "timestamp": "2026-05-10T09:44:38.783520",
+  "num_experiments": 2,
+  "experiments": {
+    "baseline_fd_solver": {
+      "rel_l2": 0.12910205125808716,
+      "mae": 0.06326925754547119,
+      "max_abs_error": 0.1917349100112915,
+      "rmse": 0.08077140152454376
+    },
+    "baseline_classical": {
+      "rel_l2": 0.019801832735538483,
+      "mae": 0.011295064352452755,
+      "max_abs_error": 0.023104187101125717,
+      "rmse": 0.012388825416564941
+    }
+  },
+  "best_metrics": {
+    "rel_l2": {
+      "experiment": "baseline_classical",
+      "value": 0.019801832735538483
+    },
+    "mae": {
+      "experiment": "baseline_classical",
+      "value": 0.011295064352452755
+    },
+    "max_abs_error": {
+      "experiment": "baseline_classical",
+      "value": 0.023104187101125717
+    },
+    "rmse": {
+      "experiment": "baseline_classical",
+      "value": 0.012388825416564941
+    }
+  }
+}

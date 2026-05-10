@@ -1,0 +1,36 @@
+{
+  "timestamp": "2026-05-10T10:22:12.676625",
+  "num_experiments": 2,
+  "experiments": {
+    "freq0.50_classical": {
+      "rel_l2": 0.019801832735538483,
+      "mae": 0.011295064352452755,
+      "max_abs_error": 0.023104187101125717,
+      "rmse": 0.012388825416564941
+    },
+    "freq0.50_qpinn": {
+      "rel_l2": 0.010879994370043278,
+      "mae": 0.00574089027941227,
+      "max_abs_error": 0.014976143836975098,
+      "rmse": 0.006806963123381138
+    }
+  },
+  "best_metrics": {
+    "rel_l2": {
+      "experiment": "freq0.50_qpinn",
+      "value": 0.010879994370043278
+    },
+    "mae": {
+      "experiment": "freq0.50_qpinn",
+      "value": 0.00574089027941227
+    },
+    "max_abs_error": {
+      "experiment": "freq0.50_qpinn",
+      "value": 0.014976143836975098
+    },
+    "rmse": {
+      "experiment": "freq0.50_qpinn",
+      "value": 0.006806963123381138
+    }
+  }
+}
