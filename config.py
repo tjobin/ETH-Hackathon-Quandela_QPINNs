@@ -11,33 +11,36 @@ import math
 @dataclass
 class PDEConfig:
     """PDE-specific parameters (heat equation by default)."""
-    alpha: float = 0.1
+    freq: float = 0.5
+    alpha: float = 0.025
     x_min: float = 0.0
     x_max: float = 1.0
     t_min: float = 0.0
     t_max: float = 1.0
-    
+
     def exact_solution(self, x, t):
         """Return exact solution u(x,t)."""
         import torch
-        return torch.exp(-self.alpha * math.pi**2 * t) * torch.sin(math.pi * x)
-    
+        return torch.exp(-self.alpha *4* self.freq * self.freq * math.pi ** 2 * t) * torch.sin(
+            2 * self.freq * math.pi * x)
+
     def initial_condition(self, x):
         """Return IC: u(x, 0) = f(x)"""
         import torch
-        #return torch.sin(math.pi * x)
-        return torch.sin(math.pi * x)
-    
+        # return torch.sin(math.pi * x)
+        return torch.sin(2 * self.freq * math.pi * x)
+
     def boundary_condition_left(self, t):
         """Return BC: u(0, t) = g1(t)"""
         import torch
         return torch.zeros_like(t)
-    
+
     def boundary_condition_right(self, t):
         """Return BC: u(1, t) = g2(t)"""
         import torch
-        return torch.zeros_like(t)
-    
+        import numpy as np
+        return torch.zeros_like(t)*np.sin(2*np.pi*self.freq)
+
 
 @dataclass
 class BurgersEquationConfig(PDEConfig):
@@ -169,7 +172,8 @@ class ModelConfig:
     quantum_output_size: int = 4       # quantum layer output size
     hidden_feature: int = 16           # hidden layer for feature map
     hidden_readout: int = 16           # hidden layer for readout
-    use_hard_bc: bool = True           # enforce boundary conditions in architecture
+    use_hard_bc: bool = False           # enforce boundary conditions in architecture
+    quantum_type: str = "simple"       # "simple" or "builder"
 
 
 @dataclass
@@ -220,6 +224,7 @@ class ExperimentConfig:
     
     # Logging
     log_every: int = 25
+    log_frequencies: bool = False
     save_checkpoint: bool = False
     checkpoint_dir: str = "./checkpoints"
 
@@ -295,6 +300,16 @@ def feature_size_sweep(f: int) -> ExperimentConfig:
     cfg.model.quantum_output_size = f
     return cfg
 
+
+def freq_sweep(f: float) -> ExperimentConfig:
+    """Sweep over initial condition frequency."""
+    cfg = baseline_config()
+    cfg.name = f"freq_{f}"
+    cfg.pde.freq = f
+    cfg.log_frequencies = True
+    cfg.training.epochs = 600
+    return cfg
+
 def burgers_equation_config() -> ExperimentConfig:
     """Burgers equation instead of heat equation."""
     cfg = baseline_config()
@@ -362,6 +377,22 @@ def lbfgs_config() -> ExperimentConfig:
     cfg.training.epochs = 100  # LBFGS typically converges faster
     return cfg
 
+def deep_builder_config() -> ExperimentConfig:
+    """Configuration for the 4-mode, 3-photon CircuitBuilder with data re-uploading."""
+    cfg = baseline_config()
+    cfg.name = "deep_quantum_builder"
+    cfg.model = ModelConfig(
+        # The builder encodes data into exactly 2 modes (modes 0 and 1)
+        feature_size=4,              
+        # 4 modes with 3 photons yields C(4+3-1, 3) = 20 distinct Fock basis states
+        # The probs() measurement outputs a vector of this exact size
+        quantum_output_size=4,      
+        hidden_feature=16,
+        hidden_readout=16,
+        quantum_type="builder"       # Triggers the new model class
+    )
+    return cfg
+
 
 # ============================================================================
 # Config Registry for Easy Access
@@ -375,11 +406,13 @@ EXPERIMENT_REGISTRY = {
     "longer_training": longer_training_config,
     "low_consistency": low_consistency_config,
     "lbfgs": lbfgs_config,
+    "deep_builder": deep_builder_config,
     
     "feature_2": lambda: feature_size_sweep(2),
     "feature_4": lambda: feature_size_sweep(4),
     "feature_8": lambda: feature_size_sweep(8),
     "feature_16": lambda: feature_size_sweep(16),
+
 
     "freeze_quantum_config": freeze_quantum_config,
     "freeze_feature_map_config": freeze_feature_map_config,
@@ -389,6 +422,9 @@ EXPERIMENT_REGISTRY = {
     "wave_equation": wave_equation_config,
 }
 
+for i in range(1,15):  # 0.5 to 3 inclusive
+    f = float(i) / 4.0
+    EXPERIMENT_REGISTRY[f"freq{f:.2f}"] = (lambda f=f: freq_sweep(f))
 
 def get_config(experiment_name: str) -> ExperimentConfig:
     """Get configuration by name from registry."""

@@ -16,6 +16,27 @@ class Plotter:
         self.save_dir = Path(save_dir) if save_dir else None
         if self.save_dir:
             self.save_dir.mkdir(parents=True, exist_ok=True)
+        self.frequency_loss_log = {}
+
+    def log_frequency_loss(self, model_type: str, frequency: float,
+                           final_loss: float, experiment_name: str = None) -> None:
+        """Record a final loss value for a model/frequency pair."""
+        self.frequency_loss_log.setdefault(model_type, []).append({
+            "frequency": float(frequency),
+            "final_loss": float(final_loss),
+            "experiment": experiment_name,
+        })
+
+    def save_frequency_loss_log(self, save_name: str = "frequency_loss_log.json") -> None:
+        """Save the recorded frequency-loss log to JSON."""
+        if not self.save_dir or not self.frequency_loss_log:
+            return
+
+        import json
+        path = self.save_dir / save_name
+        with open(path, "w") as f:
+            json.dump(self.frequency_loss_log, f, indent=2)
+        print(f"Saved: {path}")
     
     def plot_training_history(self, history: np.ndarray, 
                              figsize: Tuple[int, int] = (10, 6),
@@ -48,8 +69,8 @@ class Plotter:
             path = self.save_dir / save_name
             plt.savefig(path, dpi=150, bbox_inches='tight')
             print(f"Saved: {path}")
-        
-        plt.show()
+
+        #plt.show()
     
     def plot_solution_comparison(self, U_true: torch.Tensor, U_pred: torch.Tensor,
                                 x_grid: torch.Tensor = None, 
@@ -116,8 +137,8 @@ class Plotter:
             path = self.save_dir / save_name
             plt.savefig(path, dpi=150, bbox_inches='tight')
             print(f"Saved: {path}")
-        
-        plt.show()
+
+        #plt.show()
         
         return rel_l2
     
@@ -198,8 +219,8 @@ class Plotter:
             path = self.save_dir / save_name
             plt.savefig(path, dpi=150, bbox_inches='tight')
             print(f"Saved: {path}")
-        
-        plt.show()
+
+        #plt.show()
     
     def plot_loss_comparison(self, loss_histories: Dict[str, np.ndarray],
                             figsize: Tuple[int, int] = (10, 6),
@@ -230,8 +251,8 @@ class Plotter:
             path = self.save_dir / save_name
             plt.savefig(path, dpi=150, bbox_inches='tight')
             print(f"Saved: {path}")
-        
-        plt.show()
+
+        #plt.show()
     
     def plot_error_metrics(self, metrics: Dict[str, Dict[str, float]],
                           figsize: Tuple[int, int] = (10, 6),
@@ -267,5 +288,69 @@ class Plotter:
             path = self.save_dir / save_name
             plt.savefig(path, dpi=150, bbox_inches='tight')
             print(f"Saved: {path}")
-        
-        plt.show()
+
+        #plt.show()
+
+
+    def plot_frequency_sweep_losses(self,
+                                    sweep_results: Dict[str, List[Dict[str, float]]],
+                                    figsize: Tuple[int, int] = (9, 6),
+                                    save_name: Optional[str] = None) -> None:
+        """
+        Plot final training loss after the configured epochs as a function of IC frequency.
+
+        Args:
+            sweep_results: mapping from model type to rows with frequency/final_loss
+            figsize: figure size
+            save_name: if provided, save figure to this filename
+        """
+        plt.figure(figsize=figsize)
+
+        plotted_any = False
+        for model_type, rows in sweep_results.items():
+            valid_rows = [
+                row for row in rows
+                if row.get("final_loss") is not None and row.get("frequency") is not None
+            ]
+            if not valid_rows:
+                continue
+
+            valid_rows = sorted(valid_rows, key=lambda row: row["frequency"])
+            frequencies = [row["frequency"] for row in valid_rows]
+            final_losses = [row["final_loss"] for row in valid_rows]
+            plt.semilogy(
+                frequencies,
+                final_losses,
+                marker="o",
+                linewidth=2,
+                label=model_type,
+            )
+            plotted_any = True
+
+        plt.xlabel("Initial condition frequency", fontsize=12)
+        plt.ylabel("Final total loss", fontsize=12)
+        plt.title("Final Loss After Training vs Frequency", fontsize=14)
+        plt.grid(True, alpha=0.3)
+        if plotted_any:
+            plt.legend(fontsize=10)
+        plt.tight_layout()
+
+        if save_name and self.save_dir:
+            path = self.save_dir / save_name
+            plt.savefig(path, dpi=150, bbox_inches='tight')
+            print(f"Saved: {path}")
+
+        #plt.show()
+
+    def plot_frequency_loss_log(self,
+                                figsize: Tuple[int, int] = (9, 6),
+                                save_name: Optional[str] = "frequency_loss_curves.png") -> None:
+        """Plot the recorded final loss values as a function of frequency."""
+        if not self.frequency_loss_log:
+            return
+
+        self.plot_frequency_sweep_losses(
+            self.frequency_loss_log,
+            figsize=figsize,
+            save_name=save_name,
+        )
