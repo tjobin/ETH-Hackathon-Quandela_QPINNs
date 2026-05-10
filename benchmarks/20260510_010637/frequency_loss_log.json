@@ -1,0 +1,36 @@
+{
+  "classical": [
+    {
+      "frequency": 0.5,
+      "final_loss": 0.001569853164255619,
+      "experiment": "freq0.5_classical"
+    },
+    {
+      "frequency": 1.0,
+      "final_loss": 0.14786739647388458,
+      "experiment": "freq1.0_classical"
+    },
+    {
+      "frequency": 1.5,
+      "final_loss": 0.5111555457115173,
+      "experiment": "freq1.5_classical"
+    }
+  ],
+  "qpinn": [
+    {
+      "frequency": 0.5,
+      "final_loss": 0.0030783857218921185,
+      "experiment": "freq0.5_qpinn"
+    },
+    {
+      "frequency": 1.0,
+      "final_loss": 0.024780116975307465,
+      "experiment": "freq1.0_qpinn"
+    },
+    {
+      "frequency": 1.5,
+      "final_loss": 0.7468881607055664,
+      "experiment": "freq1.5_qpinn"
+    }
+  ]
+}

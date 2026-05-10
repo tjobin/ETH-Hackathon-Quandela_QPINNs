@@ -1,0 +1,76 @@
+{
+  "classical": [
+    {
+      "frequency": 0.25,
+      "final_loss": 0.34133973717689514,
+      "experiment": "freq0.25_classical"
+    },
+    {
+      "frequency": 0.75,
+      "final_loss": 0.4715925455093384,
+      "experiment": "freq0.75_classical"
+    },
+    {
+      "frequency": 1.25,
+      "final_loss": 1.2312829494476318,
+      "experiment": "freq1.25_classical"
+    },
+    {
+      "frequency": 1.75,
+      "final_loss": 2.262138605117798,
+      "experiment": "freq1.75_classical"
+    },
+    {
+      "frequency": 2.25,
+      "final_loss": 3.151658058166504,
+      "experiment": "freq2.25_classical"
+    },
+    {
+      "frequency": 2.75,
+      "final_loss": 4.659677982330322,
+      "experiment": "freq2.75_classical"
+    },
+    {
+      "frequency": 3.25,
+      "final_loss": 5.046525001525879,
+      "experiment": "freq3.25_classical"
+    }
+  ],
+  "qpinn": [
+    {
+      "frequency": 0.25,
+      "final_loss": 0.3473736345767975,
+      "experiment": "freq0.25_qpinn"
+    },
+    {
+      "frequency": 0.75,
+      "final_loss": 0.4294785261154175,
+      "experiment": "freq0.75_qpinn"
+    },
+    {
+      "frequency": 1.25,
+      "final_loss": 0.4844444990158081,
+      "experiment": "freq1.25_qpinn"
+    },
+    {
+      "frequency": 1.75,
+      "final_loss": 1.2869373559951782,
+      "experiment": "freq1.75_qpinn"
+    },
+    {
+      "frequency": 2.25,
+      "final_loss": 1.2612749338150024,
+      "experiment": "freq2.25_qpinn"
+    },
+    {
+      "frequency": 2.75,
+      "final_loss": 2.702691078186035,
+      "experiment": "freq2.75_qpinn"
+    },
+    {
+      "frequency": 3.25,
+      "final_loss": 4.844798564910889,
+      "experiment": "freq3.25_qpinn"
+    }
+  ]
+}

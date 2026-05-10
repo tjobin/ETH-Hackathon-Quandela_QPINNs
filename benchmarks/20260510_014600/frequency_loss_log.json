@@ -1,0 +1,146 @@
+{
+  "classical": [
+    {
+      "frequency": 0.25,
+      "final_loss": 0.1327972114086151,
+      "experiment": "freq0.25_classical"
+    },
+    {
+      "frequency": 0.5,
+      "final_loss": 0.002391341608017683,
+      "experiment": "freq0.50_classical"
+    },
+    {
+      "frequency": 0.75,
+      "final_loss": 0.4774121642112732,
+      "experiment": "freq0.75_classical"
+    },
+    {
+      "frequency": 1.0,
+      "final_loss": 0.03446129336953163,
+      "experiment": "freq1.00_classical"
+    },
+    {
+      "frequency": 1.25,
+      "final_loss": 0.4960145950317383,
+      "experiment": "freq1.25_classical"
+    },
+    {
+      "frequency": 1.5,
+      "final_loss": 0.7253607511520386,
+      "experiment": "freq1.50_classical"
+    },
+    {
+      "frequency": 1.75,
+      "final_loss": 0.8549729585647583,
+      "experiment": "freq1.75_classical"
+    },
+    {
+      "frequency": 2.0,
+      "final_loss": 1.6724209785461426,
+      "experiment": "freq2.00_classical"
+    },
+    {
+      "frequency": 2.25,
+      "final_loss": 3.3513739109039307,
+      "experiment": "freq2.25_classical"
+    },
+    {
+      "frequency": 2.5,
+      "final_loss": 2.517070770263672,
+      "experiment": "freq2.50_classical"
+    },
+    {
+      "frequency": 2.75,
+      "final_loss": 3.79267954826355,
+      "experiment": "freq2.75_classical"
+    },
+    {
+      "frequency": 3.0,
+      "final_loss": 4.173152446746826,
+      "experiment": "freq3.00_classical"
+    },
+    {
+      "frequency": 3.25,
+      "final_loss": 3.865616798400879,
+      "experiment": "freq3.25_classical"
+    },
+    {
+      "frequency": 3.5,
+      "final_loss": 5.575547218322754,
+      "experiment": "freq3.50_classical"
+    }
+  ],
+  "qpinn": [
+    {
+      "frequency": 0.25,
+      "final_loss": 0.08133365213871002,
+      "experiment": "freq0.25_qpinn"
+    },
+    {
+      "frequency": 0.5,
+      "final_loss": 0.0018928832141682506,
+      "experiment": "freq0.50_qpinn"
+    },
+    {
+      "frequency": 0.75,
+      "final_loss": 0.11909106373786926,
+      "experiment": "freq0.75_qpinn"
+    },
+    {
+      "frequency": 1.0,
+      "final_loss": 0.004969836678355932,
+      "experiment": "freq1.00_qpinn"
+    },
+    {
+      "frequency": 1.25,
+      "final_loss": 0.1929749846458435,
+      "experiment": "freq1.25_qpinn"
+    },
+    {
+      "frequency": 1.5,
+      "final_loss": 0.06761611998081207,
+      "experiment": "freq1.50_qpinn"
+    },
+    {
+      "frequency": 1.75,
+      "final_loss": 0.16557589173316956,
+      "experiment": "freq1.75_qpinn"
+    },
+    {
+      "frequency": 2.0,
+      "final_loss": 0.25723540782928467,
+      "experiment": "freq2.00_qpinn"
+    },
+    {
+      "frequency": 2.25,
+      "final_loss": 1.0314867496490479,
+      "experiment": "freq2.25_qpinn"
+    },
+    {
+      "frequency": 2.5,
+      "final_loss": 1.7693779468536377,
+      "experiment": "freq2.50_qpinn"
+    },
+    {
+      "frequency": 2.75,
+      "final_loss": 1.260201334953308,
+      "experiment": "freq2.75_qpinn"
+    },
+    {
+      "frequency": 3.0,
+      "final_loss": 2.0145328044891357,
+      "experiment": "freq3.00_qpinn"
+    },
+    {
+      "frequency": 3.25,
+      "final_loss": 2.158869981765747,
+      "experiment": "freq3.25_qpinn"
+    },
+    {
+      "frequency": 3.5,
+      "final_loss": 2.2020890712738037,
+      "experiment": "freq3.50_qpinn"
+    }
+  ]
+}

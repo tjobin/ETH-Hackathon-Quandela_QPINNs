@@ -215,10 +215,13 @@ class PhysicsLoss:
         
         x = xt_boundary[:, 0:1]
         t = xt_boundary[:, 1:2]
+
+        mask_left = torch.isclose(x, torch.zeros_like(x))
+        mask_right = torch.isclose(x, torch.ones_like(x))
         
         # Split into left (x=0) and right (x=1) boundaries
         # Left boundary: x ≈ 0
-        mask_left = x < 0.5
+        # mask_left = x < 0.5
         if mask_left.any():
             u_bc_left = self.pde.boundary_condition_left(t[mask_left])
             loss_left = self.mse(u_pred[mask_left], u_bc_left)
@@ -226,7 +229,7 @@ class PhysicsLoss:
             loss_left = torch.tensor(0.0, device=u_pred.device, dtype=u_pred.dtype)
         
         # Right boundary: x ≈ 1
-        mask_right = x >= 0.5
+        # mask_right = x >= 0.5
         if mask_right.any():
             u_bc_right = self.pde.boundary_condition_right(t[mask_right])
             loss_right = self.mse(u_pred[mask_right], u_bc_right)

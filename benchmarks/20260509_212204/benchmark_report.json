@@ -1,0 +1,30 @@
+{
+  "timestamp": "2026-05-09T21:24:31.740977",
+  "num_experiments": 1,
+  "experiments": {
+    "freq_sweep_freq0.5": {
+      "rel_l2": 0.03825516626238823,
+      "mae": 0.01503496803343296,
+      "max_abs_error": 0.034729987382888794,
+      "rmse": 0.01776261255145073
+    }
+  },
+  "best_metrics": {
+    "rel_l2": {
+      "experiment": "freq_sweep_freq0.5",
+      "value": 0.03825516626238823
+    },
+    "mae": {
+      "experiment": "freq_sweep_freq0.5",
+      "value": 0.01503496803343296
+    },
+    "max_abs_error": {
+      "experiment": "freq_sweep_freq0.5",
+      "value": 0.034729987382888794
+    },
+    "rmse": {
+      "experiment": "freq_sweep_freq0.5",
+      "value": 0.01776261255145073
+    }
+  }
+}

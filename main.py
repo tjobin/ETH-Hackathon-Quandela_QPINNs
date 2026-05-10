@@ -84,6 +84,10 @@ class Trainer:
             self.physics_loss = PhysicsLoss(config.pde)
         self.sampler = DataSampler(config.data, config.pde, device, dtype)
         
+        # Initialize Fourier metrics monitor
+        from fourier_metrics import FourierTrainingMonitor
+        self.fourier_monitor = FourierTrainingMonitor(device, dtype)
+
         # Training history
         self.history = []
     
@@ -196,7 +200,7 @@ class Trainer:
                 loss_dict["entropy"]
             ])
             
-            # Logging
+            # Logging and Fourier metrics evaluation
             if epoch == 1 or epoch % self.config.log_every == 0:
                 elapsed = time.time() - start_time
                 print(
@@ -209,7 +213,15 @@ class Trainer:
                     f"Entropy: {loss_dict['entropy']:.4f} | " # <-- NEW
                     f"Time: {elapsed:.1f}s"
                 )
-        
+
+                # Evaluate Fourier metrics every log_every epochs
+                fourier_metrics = self.fourier_monitor.evaluate(
+                    self.model, self.config, self.device, self.dtype, epoch
+                )
+                print(f"  Fourier - SpectralL2: {fourier_metrics['spectral_l2']:.4e} | "
+                      f"PowerError: {fourier_metrics['power_spectrum_error']:.4e} | "
+                      f"LowFreq: {fourier_metrics['low_freq_error']:.4e}")
+
         elapsed = time.time() - start_time
         print(f"\nTraining completed in {elapsed:.2f} seconds")
         
@@ -301,7 +313,6 @@ class Evaluator:
             "mae": float(mae),
             "max_abs_error": float(max_abs_error),
             "rmse": float(rmse),
-            
         }
         
         print(f"Relative L2 error: {metrics['rel_l2']:.4e}")
@@ -312,23 +323,20 @@ class Evaluator:
         return U_pred, U_true, x, t, metrics
 
 
-def run_experiment(experiment_name: str, model_type: str = "qpinn",
-                  output_dir: Optional[str] = None, 
-                  freeze_quantum: bool = False) -> Dict:
+def run_config(config: ExperimentConfig, model_type: str = "qpinn",
+               output_dir: Optional[str] = None,
+               freeze_quantum: bool = False) -> Dict:
     """
-    Run a complete experiment: train, evaluate, and return results.
+    Run a complete experiment from an already constructed config.
     
     Args:
-        experiment_name: name of experiment configuration
+        config: complete experiment configuration
         model_type: "qpinn", "classical", or "deep_classical"
         output_dir: directory for saving results
     
     Returns:
         results: dictionary with training, evaluation, and metrics info
     """
-    # Get configuration
-    config = get_config(experiment_name)
-    
     # Apply CLI flags to config
     if freeze_quantum:
         config.training.freeze_quantum = True
@@ -378,22 +386,83 @@ def run_experiment(experiment_name: str, model_type: str = "qpinn",
     # NEW: Plot the entropy
     if history.shape[1] > 5: # Ensure entropy was actually tracked
         plotter.plot_entropy_history(history, save_name="entropy_history.png")
-        
+
+    # Plot Fourier metrics
+    from fourier_plotter import FourierPlotter
+    fourier_plotter = FourierPlotter(save_dir=output_dir)
+    fourier_plotter.plot_power_spectrum(U_pred, U_true,
+                                       save_name="fourier_power_spectrum.png")
+    fourier_plotter.plot_spectral_errors(trainer.fourier_monitor.get_history(),
+                                        save_name="fourier_spectral_errors.png")
+    fourier_plotter.plot_spectral_concentration(trainer.fourier_monitor.get_history(),
+                                               save_name="fourier_concentration.png")
+    fourier_plotter.plot_peak_frequency(trainer.fourier_monitor.get_history(),
+                                       save_name="fourier_peak_frequency.png")
+    fourier_plotter.plot_all_spectral(U_pred, U_true,
+                                     trainer.fourier_monitor.get_history(),
+                                     save_name="fourier_comprehensive.png")
+
+    # Mode-by-mode analysis
+    fourier_plotter.plot_mode_l2_errors(U_pred, U_true,
+                                       save_name="fourier_mode_l2_errors.png")
+    fourier_plotter.plot_mode_l2_vs_k_detailed(U_pred, U_true,
+                                              save_name="fourier_mode_l2_vs_k.png")
+    fourier_plotter.plot_mode_comparison(U_pred, U_true, n_modes=16,
+                                        save_name="fourier_mode_comparison.png")
+    fourier_plotter.plot_cumulative_energy(U_pred, U_true,
+                                          save_name="fourier_cumulative_energy.png")
+
+    # Energy distribution
+    fourier_plotter.plot_energy_distribution(U_true,
+                                           save_name="fourier_energy_distribution.png")
+
     # Save results
     results = {
         "experiment": config.name,
         "model_type": model_type,
         "config": config.__dict__,
         "metrics": metrics,
-        "history": history.tolist()
+        "history": history.tolist(),
+        "fourier_metrics": trainer.fourier_monitor.get_history(),
+        "fourier_summary": trainer.fourier_monitor.summary(),
     }
-    
+
+    # Save solutions as numpy files for efficient storage
+    u_pred_np = U_pred.cpu().numpy() if hasattr(U_pred, 'cpu') else np.array(U_pred)
+    u_true_np = U_true.cpu().numpy() if hasattr(U_true, 'cpu') else np.array(U_true)
+
+    np.save(Path(output_dir) / "U_pred.npy", u_pred_np)
+    np.save(Path(output_dir) / "U_true.npy", u_true_np)
+
     results_path = Path(output_dir) / "results.json"
     with open(results_path, 'w') as f:
         json.dump(results, f, indent=2, default=str)
     print(f"\nResults saved to: {results_path}")
     
     return results
+
+
+def run_experiment(experiment_name: str, model_type: str = "qpinn",
+                  output_dir: Optional[str] = None,
+                  freeze_quantum: bool = False) -> Dict:
+    """
+    Run a complete registered experiment: train, evaluate, and return results.
+
+    Args:
+        experiment_name: name of experiment configuration
+        model_type: "qpinn", "classical", or "deep_classical"
+        output_dir: directory for saving results
+
+    Returns:
+        results: dictionary with training, evaluation, and metrics info
+    """
+    config = get_config(experiment_name)
+    return run_config(
+        config,
+        model_type=model_type,
+        output_dir=output_dir,
+        freeze_quantum=freeze_quantum,
+    )
 
 
 def main():
