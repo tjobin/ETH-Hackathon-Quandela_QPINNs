@@ -1,0 +1,48 @@
+{
+  "timestamp": "2026-05-10T00:17:46.020394",
+  "num_experiments": 4,
+  "experiments": {
+    "reupload_depth_1_reupload_qpinn": {
+      "rel_l2": 0.038255080580711365,
+      "mae": 0.015034934505820274,
+      "max_abs_error": 0.03472977876663208,
+      "rmse": 0.017762579023838043
+    },
+    "reupload_depth_2_reupload_qpinn": {
+      "rel_l2": 0.026670176535844803,
+      "mae": 0.010422938503324986,
+      "max_abs_error": 0.025133103132247925,
+      "rmse": 0.012383480556309223
+    },
+    "reupload_depth_3_reupload_qpinn": {
+      "rel_l2": 0.021534137427806854,
+      "mae": 0.008271241560578346,
+      "max_abs_error": 0.03134973347187042,
+      "rmse": 0.00999872013926506
+    },
+    "reupload_depth_4_reupload_qpinn": {
+      "rel_l2": 0.02026030234992504,
+      "mae": 0.00717876385897398,
+      "max_abs_error": 0.023669570684432983,
+      "rmse": 0.00940725114196539
+    }
+  },
+  "best_metrics": {
+    "rel_l2": {
+      "experiment": "reupload_depth_4_reupload_qpinn",
+      "value": 0.02026030234992504
+    },
+    "mae": {
+      "experiment": "reupload_depth_4_reupload_qpinn",
+      "value": 0.00717876385897398
+    },
+    "max_abs_error": {
+      "experiment": "reupload_depth_4_reupload_qpinn",
+      "value": 0.023669570684432983
+    },
+    "rmse": {
+      "experiment": "reupload_depth_4_reupload_qpinn",
+      "value": 0.00940725114196539
+    }
+  }
+}

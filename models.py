@@ -192,6 +192,69 @@ class ClassicalHeatQPINN(nn.Module):
         return u, ux_hat
 
 
+class ReuploadClassicalHeatQPINN(nn.Module):
+    """
+    Classical baseline mirroring the re-uploading depth experiment.
+
+    Uses the same ModelConfig.quantum_depth field as ReuploadMerlinHeatQPINN,
+    but replaces each additional quantum re-upload block with one trainable
+    classical layer. With quantum_depth=1, this matches ClassicalHeatQPINN.
+    """
+    
+    def __init__(self, config: ModelConfig):
+        super().__init__()
+        self.config = config
+        self.depth = getattr(config, "quantum_depth", 1)
+        if self.depth < 1:
+            raise ValueError(f"quantum_depth must be at least 1, got {self.depth}")
+        
+        self.feature_map = nn.Sequential(
+            nn.Linear(2, config.hidden_feature),
+            nn.Tanh(),
+            nn.Linear(config.hidden_feature, config.feature_size),
+            nn.Tanh(),
+        )
+        
+        self.quantum_width_projection = nn.Sequential(
+            nn.Linear(config.feature_size, config.quantum_output_size),
+            nn.Tanh(),
+        )
+        
+        self.extra_layers = nn.ModuleList([
+            nn.Sequential(
+                nn.Linear(config.quantum_output_size, config.quantum_output_size),
+                nn.Tanh(),
+            )
+            for _ in range(self.depth - 1)
+        ])
+        
+        self.readout = nn.Sequential(
+            nn.Linear(config.quantum_output_size, config.hidden_readout),
+            nn.Tanh(),
+            nn.Linear(config.hidden_readout, 2),
+        )
+    
+    def forward(self, xt: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
+        x = xt[:, 0:1]
+        h = self.feature_map(xt)
+        h = self.quantum_width_projection(h)
+        
+        for layer in self.extra_layers:
+            h = layer(h)
+        
+        out = self.readout(h)
+        
+        q_u = out[:, 0:1]
+        ux_hat = out[:, 1:2]
+        
+        if self.config.use_hard_bc:
+            u = x * (1.0 - x) * q_u
+        else:
+            u = q_u
+        
+        return u, ux_hat
+
+
 class DeepNetworkQPINN(nn.Module):
     """
     Deeper classical network QPINN for ablation studies.
@@ -225,6 +288,101 @@ class DeepNetworkQPINN(nn.Module):
         """
         x = xt[:, 0:1]
         out = self.network(xt)
+        
+        q_u = out[:, 0:1]
+        ux_hat = out[:, 1:2]
+        
+        if self.config.use_hard_bc:
+            u = x * (1.0 - x) * q_u
+        else:
+            u = q_u
+        
+        return u, ux_hat
+
+
+class ReuploadMerlinHeatQPINN(nn.Module):
+    """
+    QPINN with one quantum circuit using sequential data re-uploading blocks.
+
+    Circuit layout:
+        U_0(W_0) -> U_enc(x,t) -> U_1(W_1) -> U_enc(x,t) -> U_2(W_2) -> ...
+
+    With quantum_depth=1 this matches MerLin's QuantumLayer.simple layout:
+        trainable -> encoding -> trainable
+
+    The circuit is measured once at the end, then a classical readout predicts
+    [q_u, ux_hat].
+    """
+    
+    def __init__(self, config: ModelConfig):
+        super().__init__()
+        self.config = config
+        self.quantum_depth = getattr(config, "quantum_depth", 1)
+        if self.quantum_depth < 1:
+            raise ValueError(f"quantum_depth must be at least 1, got {self.quantum_depth}")
+        
+        self.feature_map = nn.Sequential(
+            nn.Linear(2, config.hidden_feature),
+            nn.Tanh(),
+            nn.Linear(config.hidden_feature, config.feature_size),
+        )
+        
+        try:
+            import merlin as ML
+            
+            n_modes = config.feature_size + 1
+            input_state = [1 if i % 2 == 0 else 0 for i in range(n_modes)]
+            
+            builder = ML.CircuitBuilder(n_modes=n_modes)
+            builder.add_entangling_layer(trainable=True, name="LI_simple")
+            for block_idx in range(self.quantum_depth):
+                builder.add_angle_encoding(
+                    modes=list(range(config.feature_size)),
+                    name="input",
+                    subset_combinations=False,
+                )
+                builder.add_entangling_layer(
+                    trainable=True,
+                    model="mzi",
+                    name="RI_simple" if block_idx == 0 else f"reupload_block_{block_idx + 1}",
+                )
+            
+            self.quantum = ML.QuantumLayer(
+                input_size=config.feature_size * self.quantum_depth,
+                builder=builder,
+                input_state=input_state,
+                n_photons=sum(input_state),
+                measurement_strategy=ML.MeasurementStrategy.probs(
+                    computation_space=ML.ComputationSpace.UNBUNCHED
+                ),
+            )
+            
+            if self.quantum.output_size != config.quantum_output_size:
+                self.quantum_postprocess = ML.ModGrouping(
+                    self.quantum.output_size,
+                    config.quantum_output_size,
+                )
+            else:
+                self.quantum_postprocess = nn.Identity()
+        except ImportError as e:
+            raise ImportError(
+                "Could not import MerLin. Install with: pip install merlinquantum"
+            ) from e
+        
+        self.readout = nn.Sequential(
+            nn.Linear(config.quantum_output_size, config.hidden_readout),
+            nn.Tanh(),
+            nn.Linear(config.hidden_readout, 2),
+        )
+    
+    def forward(self, xt: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
+        x = xt[:, 0:1]
+        z = self.feature_map(xt)
+        z_reuploaded = torch.cat([z] * self.quantum_depth, dim=1)
+        
+        q = self.quantum(z_reuploaded)
+        q = self.quantum_postprocess(q)
+        out = self.readout(q)
         
         q_u = out[:, 0:1]
         ux_hat = out[:, 1:2]
@@ -328,6 +486,10 @@ def create_model(config: ModelConfig, model_type: str = "qpinn") -> nn.Module:
         return MerlinHeatQPINN(config)
     elif model_type == "qpinn_frozen":
         return MerlinHeatQPINN_freezeQMweights(config)
+    elif model_type == "reupload_qpinn":
+        return ReuploadMerlinHeatQPINN(config)
+    elif model_type == "reupload_classical":
+        return ReuploadClassicalHeatQPINN(config)
     elif model_type == "classical":
         return ClassicalHeatQPINN(config)
     elif model_type == "deep_classical":

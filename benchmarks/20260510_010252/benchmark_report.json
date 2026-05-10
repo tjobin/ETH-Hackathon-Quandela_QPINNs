@@ -1,0 +1,36 @@
+{
+  "timestamp": "2026-05-10T01:03:39.956233",
+  "num_experiments": 2,
+  "experiments": {
+    "reupload_depth_4_reupload_qpinn": {
+      "rel_l2": 0.02026030234992504,
+      "mae": 0.00717876385897398,
+      "max_abs_error": 0.023669570684432983,
+      "rmse": 0.00940725114196539
+    },
+    "reupload_depth_4_reupload_classical": {
+      "rel_l2": 0.30153247714042664,
+      "mae": 0.10718239843845367,
+      "max_abs_error": 0.3073454797267914,
+      "rmse": 0.1400073915719986
+    }
+  },
+  "best_metrics": {
+    "rel_l2": {
+      "experiment": "reupload_depth_4_reupload_qpinn",
+      "value": 0.02026030234992504
+    },
+    "mae": {
+      "experiment": "reupload_depth_4_reupload_qpinn",
+      "value": 0.00717876385897398
+    },
+    "max_abs_error": {
+      "experiment": "reupload_depth_4_reupload_qpinn",
+      "value": 0.023669570684432983
+    },
+    "rmse": {
+      "experiment": "reupload_depth_4_reupload_qpinn",
+      "value": 0.00940725114196539
+    }
+  }
+}

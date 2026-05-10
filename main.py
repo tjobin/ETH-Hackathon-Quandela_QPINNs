@@ -394,7 +394,7 @@ def main():
     parser.add_argument("--experiment", type=str, default="baseline",
                        help="Experiment configuration to run")
     parser.add_argument("--model-type", type=str, default="qpinn",
-                       choices=["qpinn", "qpinn_frozen", "classical", "deep_classical"],
+                       choices=["qpinn", "qpinn_frozen", "reupload_qpinn", "reupload_classical", "classical", "deep_classical"],
                        help="Model type to use")
     parser.add_argument("--output-dir", type=str, default=None,
                        help="Output directory for results")

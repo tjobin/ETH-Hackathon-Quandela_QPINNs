@@ -171,6 +171,7 @@ class ModelConfig:
     hidden_readout: int = 16           # hidden layer for readout
     use_hard_bc: bool = True           # enforce boundary conditions in architecture
     quantum_type: str = "simple"       # "simple" or "builder"
+    quantum_depth: int = 1             # number of data re-upload blocks
 
 
 @dataclass
@@ -380,6 +381,14 @@ def deep_builder_config() -> ExperimentConfig:
     return cfg
 
 
+def reupload_depth_config(depth: int) -> ExperimentConfig:
+    """QPINN with repeated data re-uploading blocks before one measurement."""
+    cfg = baseline_config()
+    cfg.name = f"reupload_depth_{depth}"
+    cfg.model.quantum_depth = depth
+    return cfg
+
+
 # ============================================================================
 # Config Registry for Easy Access
 # ============================================================================
@@ -393,6 +402,10 @@ EXPERIMENT_REGISTRY = {
     "low_consistency": low_consistency_config,
     "lbfgs": lbfgs_config,
     "deep_builder": deep_builder_config,
+    "reupload_depth_1": lambda: reupload_depth_config(1),
+    "reupload_depth_2": lambda: reupload_depth_config(2),
+    "reupload_depth_3": lambda: reupload_depth_config(3),
+    "reupload_depth_4": lambda: reupload_depth_config(4),
     
     "feature_2": lambda: feature_size_sweep(2),
     "feature_4": lambda: feature_size_sweep(4),
