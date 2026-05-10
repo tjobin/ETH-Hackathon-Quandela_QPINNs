@@ -411,6 +411,24 @@ def deep_builder_config() -> ExperimentConfig:
     )
     return cfg
 
+def freq_sweep_entropy_config(f: float) -> ExperimentConfig:
+    """Frequency sweep configuration."""
+    cfg = baseline_config()
+    cfg.name = f"freq_{f:.2f}"
+    cfg.pde.freq = f
+    cfg.training.epochs = 600
+    cfg.model = ModelConfig(
+        # The builder encodes data into exactly 2 modes (modes 0 and 1)
+        feature_size=4,              
+        # 4 modes with 3 photons yields C(4+3-1, 3) = 20 distinct Fock basis states
+        # The probs() measurement outputs a vector of this exact size
+        quantum_output_size=20,      
+        hidden_feature=16,
+        hidden_readout=16,
+        quantum_type="builder"       # Triggers the new model class
+    )
+    return cfg
+
 
 # ============================================================================
 # Config Registry for Easy Access
@@ -440,12 +458,18 @@ EXPERIMENT_REGISTRY = {
     "wave_equation": wave_equation_config,
 }
 
-for i in range(1,15):  # 0.5 to 3 inclusive
+for i in range(1,25):  # 0.5 to 3 inclusive
     f = float(i) / 4.0
     EXPERIMENT_REGISTRY[f"freq{f:.2f}"] = (lambda f=f: freq_sweep(f))
 
 def get_config(experiment_name: str) -> ExperimentConfig:
     """Get configuration by name from registry."""
+    
+    # Dynamically generate freq_entX.XX configs for any arbitrary frequency
+    if experiment_name.startswith("freq_ent"):
+        freq_val = float(experiment_name.replace("freq_ent", ""))
+        return freq_sweep_entropy_config(freq_val)
+
     if experiment_name not in EXPERIMENT_REGISTRY:
         raise ValueError(
             f"Unknown experiment: {experiment_name}. "
