@@ -280,7 +280,7 @@ class FourierTrainingMonitor:
         
         # Forward pass (no gradients)
         with torch.no_grad():
-            U_pred, _ = model(xt_grid)
+            U_pred, _, *_ = model(xt_grid)
             U_pred = U_pred.reshape(nx, nt)
             
             # Exact solution

@@ -269,11 +269,11 @@ class Plotter:
         
         # Extract all metric types
         metric_types = list(metrics[names[0]].keys()) if names else []
-        
-        fig, axes = plt.subplots(1, len(metric_types), figsize=(5*len(metric_types), 5))
+
+        fig, axes = plt.subplots(1, len(metric_types), figsize=(5 * len(metric_types), 5))
         if len(metric_types) == 1:
             axes = [axes]
-        
+
         for i, metric_type in enumerate(metric_types):
             values = [metrics[name][metric_type] for name in names]
             axes[i].bar(names, values, alpha=0.7, edgecolor='black')
@@ -281,16 +281,15 @@ class Plotter:
             axes[i].set_title(f"{metric_type} Comparison", fontsize=12)
             axes[i].tick_params(axis='x', rotation=45)
             axes[i].grid(True, alpha=0.3, axis='y')
-        
+
         plt.tight_layout()
-        
+
         if save_name and self.save_dir:
             path = self.save_dir / save_name
             plt.savefig(path, dpi=150, bbox_inches='tight')
             print(f"Saved: {path}")
 
-            #plt.show()
-
+            # plt.show()
 
     def plot_frequency_sweep_losses(self,
                                     sweep_results: Dict[str, List[Dict[str, float]]],
@@ -367,4 +366,4 @@ class Plotter:
             plt.savefig(path, dpi=150, bbox_inches='tight')
             print(f"Saved: {path}")
 
-        plt.show()
+        #plt.show()
