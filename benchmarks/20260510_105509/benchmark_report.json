@@ -1,0 +1,30 @@
+{
+  "timestamp": "2026-05-10T10:55:37.102210",
+  "num_experiments": 1,
+  "experiments": {
+    "freq3.00_qpinn_builder": {
+      "rel_l2": 0.5698229074478149,
+      "mae": 0.08333659917116165,
+      "max_abs_error": 0.36366966366767883,
+      "rmse": 0.09835831820964813
+    }
+  },
+  "best_metrics": {
+    "rel_l2": {
+      "experiment": "freq3.00_qpinn_builder",
+      "value": 0.5698229074478149
+    },
+    "mae": {
+      "experiment": "freq3.00_qpinn_builder",
+      "value": 0.08333659917116165
+    },
+    "max_abs_error": {
+      "experiment": "freq3.00_qpinn_builder",
+      "value": 0.36366966366767883
+    },
+    "rmse": {
+      "experiment": "freq3.00_qpinn_builder",
+      "value": 0.09835831820964813
+    }
+  }
+}

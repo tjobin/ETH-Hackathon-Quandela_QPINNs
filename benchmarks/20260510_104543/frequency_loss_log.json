@@ -1,0 +1,9 @@
+{
+  "qpinn_builder": [
+    {
+      "frequency": 0.5,
+      "final_loss": 0.0021825318690389395,
+      "experiment": "freq0.50_qpinn_builder"
+    }
+  ]
+}

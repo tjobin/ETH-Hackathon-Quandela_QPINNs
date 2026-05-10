@@ -1,0 +1,16 @@
+{
+  "classical": [
+    {
+      "frequency": 1.5,
+      "final_loss": 0.7253607511520386,
+      "experiment": "freq1.50_classical"
+    }
+  ],
+  "qpinn": [
+    {
+      "frequency": 1.5,
+      "final_loss": 0.06761611998081207,
+      "experiment": "freq1.50_qpinn"
+    }
+  ]
+}

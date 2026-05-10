@@ -678,16 +678,18 @@ class BenchmarkSuite:
         markers = ['o', 's', '^', 'd', 'v', 'p', '*']
         colors = plt.cm.Set1(np.linspace(0, 1, len(mode_errors_dict)))
 
-#        # Extract frequency from experiment name
-#        freq_match = re.search(r'freq([0-9p.]+)', exp_name)
-#        frequency = freq_match.group(1).replace('p', '.') if freq_match else 'baseline'
-#
-#        # Create color map by frequency
-#        unique_freqs = sorted(list(set(data.get('frequency', 'baseline') for data in mode_errors_dict.values())))
-#        freq_to_color = {freq: plt.cm.Set1(i / len(unique_freqs)) for i, freq in enumerate(unique_freqs)}
-#
-#        # All models with same frequency get same color
-#        colors = freq_to_color[data.get('frequency', 'baseline')]
+        # Step 1: Extract all frequencies
+        frequencies = [data.get('frequency', 'baseline') for data in mode_errors_dict.values()]
+        unique_freqs = sorted(list(set(frequencies)))  # ['1.5', '2.0', '4', '4.5']
+
+        # Step 2: Create index mapping (same frequency = same index)
+        freq_to_color_idx = {freq: i for i, freq in enumerate(unique_freqs)}
+        # Results: {'1.5': 0, '2.0': 1, '4': 2, '4.5': 3}
+
+        # Step 3: Get colors from colormap
+        colors = plt.cm.Set1(np.linspace(0, 1, 20))  # 4 unique colors
+
+
 
         # Get number of modes (already positive frequencies only)
         n_modes = list(mode_errors_dict.values())[0]['mode_errors'].shape[0]
@@ -723,11 +725,11 @@ class BenchmarkSuite:
 
         fig, ax = plt.subplots(figsize=(12, 6))
 
-        for idx, (exp_name, data) in enumerate(mode_errors_dict.items()):
-            #marker = 'o' if 'classical' in exp_name else 's'
+        for idx, (exp_name, data) in enumerate(mode_errors_dict.items()):            
+            label = _extract_exp_label(exp_name)
             marker = 'o' if re.search(r'_classical$', exp_name) else 's'
             ax.loglog(modes[1:], data['mode_errors'][1:], marker=marker,
-                     label=_extract_exp_label(exp_name), linewidth=2.5, markersize=6, color=colors[idx], alpha=0.8)
+                     label=label, linewidth=2.5, markersize=6, color=colors[idx], alpha=0.8)
 
         ax.set_xlabel('Mode Index k (log)', fontsize=12)
         ax.set_ylabel('L2 Error (log)', fontsize=12)

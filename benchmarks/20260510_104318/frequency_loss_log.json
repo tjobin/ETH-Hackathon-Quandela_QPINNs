@@ -1,0 +1,30 @@
+{
+  "classical": [
+    {
+      "frequency": 0.5,
+      "final_loss": 0.002391341608017683,
+      "experiment": "freq0.50_classical"
+    }
+  ],
+  "qpinn": [
+    {
+      "frequency": 0.5,
+      "final_loss": 0.0018928832141682506,
+      "experiment": "freq0.50_qpinn"
+    }
+  ],
+  "qpinn_builder": [
+    {
+      "frequency": 0.5,
+      "final_loss": 0.0021825318690389395,
+      "experiment": "freq0.50_qpinn_builder"
+    }
+  ],
+  "fd_solver": [
+    {
+      "frequency": 0.5,
+      "final_loss": 0.11251163482666016,
+      "experiment": "freq0.50_fd_solver"
+    }
+  ]
+}
