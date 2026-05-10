@@ -169,6 +169,7 @@ class DataConfig:
 class ModelConfig:
     """Neural network architecture parameters."""
     feature_size: int = 4              # feature map output size
+    n_photons: int = 3                # number of photons for builder model
     quantum_output_size: int = 4       # quantum layer output size
     hidden_feature: int = 16           # hidden layer for feature map
     hidden_readout: int = 16           # hidden layer for readout
@@ -301,7 +302,7 @@ def feature_size_sweep(f: int) -> ExperimentConfig:
     return cfg
 
 
-def freq_sweep(f: float) -> ExperimentConfig:
+def _freq_sweep(f: float) -> ExperimentConfig:
     """Sweep over initial condition frequency."""
     cfg = baseline_config()
     cfg.name = f"freq_{f}"
@@ -414,19 +415,21 @@ def deep_builder_config() -> ExperimentConfig:
 def freq_sweep_entropy_config(f: float) -> ExperimentConfig:
     """Frequency sweep configuration."""
     cfg = baseline_config()
-    cfg.name = f"freq_{f:.2f}"
+    cfg.name = f"freq_ent{f:.2f}"
     cfg.pde.freq = f
     cfg.training.epochs = 600
+    cfg.log_frequencies = True
     cfg.model = ModelConfig(
         # The builder encodes data into exactly 2 modes (modes 0 and 1)
-        feature_size=4,              
+        feature_size=6,
         # 4 modes with 3 photons yields C(4+3-1, 3) = 20 distinct Fock basis states
-        # The probs() measurement outputs a vector of this exact size
-        quantum_output_size=20,      
+        # The probs() measurement outputs a vector of this exact size     
         hidden_feature=16,
         hidden_readout=16,
         quantum_type="builder"       # Triggers the new model class
     )
+    cfg.model.n_photons = 3            
+    cfg.model.quantum_depth = 2
     return cfg
 
 
@@ -460,7 +463,7 @@ EXPERIMENT_REGISTRY = {
 
 for i in range(1,25):  # 0.5 to 3 inclusive
     f = float(i) / 4.0
-    EXPERIMENT_REGISTRY[f"freq{f:.2f}"] = (lambda f=f: freq_sweep(f))
+    EXPERIMENT_REGISTRY[f"freq{f:.2f}"] = (lambda f=f: _freq_sweep(f))
 
 def get_config(experiment_name: str) -> ExperimentConfig:
     """Get configuration by name from registry."""

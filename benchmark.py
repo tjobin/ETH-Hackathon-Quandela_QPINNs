@@ -15,7 +15,7 @@ import numpy as np
 from datetime import datetime
 import matplotlib.pyplot as plt
 
-from config import list_experiments, freq_sweep
+from config import _freq_sweep, list_experiments
 from main import run_experiment, run_config
 from plotter import Plotter
 
@@ -110,7 +110,7 @@ class BenchmarkSuite:
 
         for freq in freqs:
             for model_type in model_types:
-                cfg = freq_sweep(freq)
+                cfg = _freq_sweep(freq)
                 if epochs is not None:
                     cfg.training.epochs = epochs
 
@@ -136,6 +136,7 @@ class BenchmarkSuite:
                         "experiment_key": exp_key,
                         "final_loss": float(history[-1, 0]),
                         "best_loss": float(history[:, 0].min()),
+                        "final_entropy": float(history[-1, 5]) if history.shape[1] > 5 else 0.0,
                         "rel_l2": results["metrics"].get("rel_l2"),
                         "mae": results["metrics"].get("mae"),
                         "rmse": results["metrics"].get("rmse"),
@@ -173,10 +174,12 @@ class BenchmarkSuite:
                         model_type,
                         row["frequency"],
                         row["final_loss"],
+                        row["final_entropy"],
                         row.get("experiment_key"),
                     )
         plotter.save_frequency_loss_log("frequency_loss_log.json")
-        plotter.plot_frequency_loss_log(save_name="frequency_sweep_final_loss.png")
+        plotter.plot_frequency_sweep_losses(sweep_summary, save_name="frequency_sweep_final_loss.png")
+        plotter.plot_frequency_sweep_entropy(sweep_summary, save_name="frequency_sweep_final_entropy.png")
 
     def lr_sweep(self, lrs: List[float], n_experiments: int = 5) -> Dict:
         """
@@ -317,7 +320,7 @@ class BenchmarkSuite:
 
         self._log_frequency_losses(plotter)
         plotter.save_frequency_loss_log()
-        plotter.plot_frequency_loss_log()
+        plotter.plot_frequency_sweep_entropy(plotter.frequency_loss_log, save_name="frequency_sweep_final_entropy.png")
 
     def _log_frequency_losses(self, plotter: Plotter) -> None:
         """Collect final loss over frequency for configs that opt in."""
@@ -329,14 +332,19 @@ class BenchmarkSuite:
             if isinstance(config, dict):
                 log_frequencies = config.get("log_frequencies", False)
                 pde_config = config.get("pde")
+                
+                # Extract frequency safely whether pde_config is still an object or a parsed dict
+                if isinstance(pde_config, dict):
+                    frequency = pde_config.get("freq")
+                else:
+                    frequency = getattr(pde_config, "freq", None)
             else:
                 log_frequencies = getattr(config, "log_frequencies", False)
                 pde_config = getattr(config, "pde", None)
+                frequency = getattr(pde_config, "freq", None)
 
             if not log_frequencies:
                 continue
-
-            frequency = getattr(pde_config, "freq", None)
             if frequency is None:
                 continue
 
@@ -348,6 +356,7 @@ class BenchmarkSuite:
                 result.get("model_type", "unknown"),
                 frequency,
                 history[-1, 0],
+                float(history[-1, 5]) if history.shape[1] > 5 else 0.0,
                 exp_name,
             )
 

@@ -19,11 +19,12 @@ class Plotter:
         self.frequency_loss_log = {}
 
     def log_frequency_loss(self, model_type: str, frequency: float,
-                           final_loss: float, experiment_name: str = None) -> None:
+                           final_loss: float, final_entropy: float, experiment_name: str = None) -> None:
         """Record a final loss value for a model/frequency pair."""
         self.frequency_loss_log.setdefault(model_type, []).append({
             "frequency": float(frequency),
             "final_loss": float(final_loss),
+            'final_entropy': float(final_entropy),
             "experiment": experiment_name,
         })
 
@@ -340,7 +341,53 @@ class Plotter:
             print(f"Saved: {path}")
 
         #plt.show()
+    def plot_frequency_sweep_entropy(self,
+                                     sweep_results: Dict[str, List[Dict[str, float]]],
+                                     figsize: Tuple[int, int] = (9, 6),
+                                     save_name: Optional[str] = None) -> None:
+        """
+        Plot final entanglement entropy after the configured epochs as a function of IC frequency.
 
+        Args:
+            sweep_results: mapping from model type to rows with frequency/final_entropy
+            figsize: figure size
+            save_name: if provided, save figure to this filename
+        """
+        plt.figure(figsize=figsize)
+
+        plotted_any = False
+        for model_type, rows in sweep_results.items():
+            valid_rows = [
+                row for row in rows
+                if row.get("final_entropy") is not None and row.get("frequency") is not None
+            ]
+            if not valid_rows:
+                continue
+
+            valid_rows = sorted(valid_rows, key=lambda row: row["frequency"])
+            frequencies = [row["frequency"] for row in valid_rows]
+            final_entropies = [row["final_entropy"] for row in valid_rows]
+            plt.plot(
+                frequencies,
+                final_entropies,
+                marker="s",
+                linewidth=2,
+                label=model_type,
+            )
+            plotted_any = True
+
+        plt.xlabel("Initial condition frequency", fontsize=12)
+        plt.ylabel("Final Von Neumann Entropy", fontsize=12)
+        plt.title("Final Entanglement Entropy vs Frequency", fontsize=14)
+        plt.grid(True, alpha=0.3)
+        if plotted_any:
+            plt.legend(fontsize=10)
+        plt.tight_layout()
+
+        if save_name and self.save_dir:
+            path = self.save_dir / save_name
+            plt.savefig(path, dpi=150, bbox_inches='tight')
+            print(f"Saved: {path}")
 
     def plot_entropy_history(self, history: np.ndarray,
                              figsize: Tuple[int, int] = (8, 4),

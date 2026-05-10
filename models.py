@@ -5,6 +5,7 @@ Supports different quantum and classical architectures.
 
 import torch
 import torch.nn as nn
+import scipy
 from typing import Tuple
 from config import ModelConfig
 from merlin.core.state_vector import StateVector
@@ -261,11 +262,16 @@ class BuilderMerlinHeatQPINN(nn.Module):
         try:
             import merlin as ML
             
-            builder = ML.CircuitBuilder(n_modes=4)
-            for _ in range(config.feature_size // 2):
+            # 1. Encode all features at the start
+            builder = ML.CircuitBuilder(n_modes=config.feature_size)
+            builder.add_angle_encoding(modes=None, name="x") # modes=None defaults to all modes
+
+            # 2. Add multiple processing layers (depth)
+            depth = config.quantum_depth # or config.quantum_depth
+            for _ in range(depth):
                 builder.add_entangling_layer(trainable=True, model="mzi")
-                builder.add_angle_encoding(modes=[0, 1]) # Allocates input slots 0, 1
-            builder.add_entangling_layer(trainable=True, model="mzi")
+
+            input_state = [1 for _ in range(config.n_photons)] + [0 for _ in range(config.feature_size - config.n_photons)]
 
             pcvl_circuit = builder.to_pcvl_circuit()
             num_modes = pcvl_circuit.m
@@ -277,7 +283,7 @@ class BuilderMerlinHeatQPINN(nn.Module):
                 # The circuit expects 4 inputs, so multiply feature_size by the number of uploads (2)
                 input_size=config.feature_size,
                 builder=builder,
-                input_state=StateVector.from_basic_state([1, 1, 1, 0]),
+                input_state=StateVector.from_basic_state(input_state),
                 measurement_strategy=ML.MeasurementStrategy.amplitudes(computation_space='fock')
             )
         except ImportError as e:
@@ -286,7 +292,7 @@ class BuilderMerlinHeatQPINN(nn.Module):
             ) from e
         
         self.readout = nn.Sequential(
-            nn.Linear(config.quantum_output_size, config.hidden_readout),
+            nn.Linear(int(scipy.special.comb(config.feature_size+config.n_photons-1, config.n_photons)), config.hidden_readout),
             nn.Tanh(),
             nn.Linear(config.hidden_readout, 2),
         )

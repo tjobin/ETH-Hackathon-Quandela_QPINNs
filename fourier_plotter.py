@@ -216,9 +216,8 @@ class FourierPlotter:
         ax.plot(epochs, peak_pred, 's--', label='Predicted Solution', linewidth=2.5, markersize=6, alpha=0.8)
         
         ax.set_xlabel('Epoch', fontsize=12)
-        ax.set_ylabel('Dominant Frequency (normalized)', fontsize=12)
+        ax.set_ylabel('Dominant Spatial Frequency (periods)', fontsize=12)
         ax.set_title('Peak Frequency vs Training', fontsize=13)
-        ax.set_ylim([0, 1])
         ax.legend(fontsize=11, loc='best')
         ax.grid(True, alpha=0.3)
         

@@ -170,10 +170,10 @@ class PhysicsLoss:
         Returns:
             entropy: scalar tensor representing the average bipartite entanglement entropy
         """
-        _, _, *entanglement_entropy = model(xt_interior)
-        if not entanglement_entropy:
+        outputs = model(xt_interior)
+        if len(outputs) <= 2 or outputs[2] is None:
             return torch.tensor(0.0, device=xt_interior.device, dtype=xt_interior.dtype)
-        return torch.tensor(entanglement_entropy).mean()
+        return outputs[2].mean()
     
     def initial_condition_loss(self, model, xt_initial: torch.Tensor,
                                exact_fn=None) -> torch.Tensor:

@@ -158,17 +158,16 @@ class FourierMetrics:
         u_hat = self.fft_1d(u)
         power = self.power_spectrum(u_hat)
         
-        # Flatten if 2D
+        # Average over time if 2D to get the spatial power spectrum
         if power.dim() > 1:
-            power = power.flatten()
+            power = power.mean(dim=1)
         
-        # Find index of peak (excluding DC component at 0)
-        peak_idx = torch.argmax(power[1:]) + 1
         nx = len(power)
+        # Find index of peak (excluding DC component at 0) up to the Nyquist limit
+        peak_idx = torch.argmax(power[1:nx//2]) + 1
         
-        # Normalize to [0, 1]
-        peak_freq = float(peak_idx) / nx
-        return peak_freq
+        # The index directly corresponds to the spatial frequency (periods per domain)
+        return float(peak_idx)
     
     def spectral_concentration(self, u: torch.Tensor, threshold: float = 0.9) -> float:
         """
@@ -188,9 +187,12 @@ class FourierMetrics:
         u_hat = self.fft_1d(u)
         power = self.power_spectrum(u_hat)
         
-        # Flatten to 1D if needed
+        # Average over time if 2D to get the spatial power spectrum
         if power.dim() > 1:
-            power = power.flatten()
+            power = power.mean(dim=1)
+            
+        # Keep only positive frequencies
+        power = power[:len(power)//2]
         
         # Total energy
         total_energy = torch.sum(power)
